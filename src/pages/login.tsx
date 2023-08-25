@@ -2,6 +2,9 @@ import { Button, Checkbox, Col, Form, FormInstance, Input, Layout, Row } from "a
 import { useState } from "react"
 import { Content } from "antd/es/layout/layout"
 import { ServerError } from "../consts/server-types";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERIES } from "../consts/query-consts";
+import { Navigate } from "react-router-dom";
 
 
   
@@ -12,9 +15,12 @@ type FieldType = {
   };
 
 
-export const Login = ()=>{
-   
+  
 
+export const Login = ()=>{
+  
+    const queryClient  = useQueryClient()
+    const data = queryClient.getQueryData([QUERIES.auth])
     //replace with actual errors from server 
     const [errors, setErrors] =  useState<ServerError[]>([])
 
@@ -45,6 +51,13 @@ export const Login = ()=>{
 
     }
 
+   
+
+
+    if(data) {
+
+        return <Navigate to="/" />
+    }
 
     return(
 
