@@ -7,6 +7,9 @@ import "antd/dist/reset.css"
 import { AppLayout } from './components/layout/app-layout';
 import { AuthData } from './components/auth/auth-data';
 import { NotFound } from './pages/not-found';
+import { NotAuthorized } from './pages/not-authorized';
+import { AuthorizationRoute } from './components/auth/authorization-route';
+import { UserRoles } from './consts/users';
 
 
 function App() {
@@ -27,13 +30,14 @@ function App() {
                         
 
                       <Route path='' element={
+                          <AuthorizationRoute roles={[UserRoles.ADMIN, UserRoles.SUPERVISOR]}/>
+                        }>
+                            <>
+                                Hello admin
+                            </>
 
-                          <>
-                          This is the dashboard</>
-
-                      }/>
-
-
+                        </Route>
+                      <Route path="/403" element={<NotAuthorized/>} />
                       <Route path='*'  element={<NotFound/>} />
                   </Route>
               </Route>

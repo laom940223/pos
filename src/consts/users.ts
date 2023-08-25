@@ -13,6 +13,15 @@ export type User = {
 }
 
 
+export enum UserRoles {
+
+
+    ADMIN = "ADMIN",
+    SUPERVISOR= "SUPERVISOR",
+    EMPLOYEE = "EMPLOYEE"
+    
+}
+
 export const defaultUser :User = {
 
 
@@ -21,6 +30,9 @@ export const defaultUser :User = {
     name:"Misael",
     lastname:"Tester",
     email: "misatester@tester.com",
-    role:"EMPLOYEE"
+    role: UserRoles.EMPLOYEE
 
 } 
+
+
+
