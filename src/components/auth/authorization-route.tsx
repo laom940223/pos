@@ -4,7 +4,7 @@ import { QUERIES } from "../../consts/query-consts"
 import { useQueryClient } from "@tanstack/react-query"
 
 import { Navigate, Outlet } from 'react-router-dom'
-import { User } from "../../consts/users"
+import { UsersType } from "../../consts/users"
 
 
 export interface AuthorizationRouteProps {
@@ -20,7 +20,7 @@ export const AuthorizationRoute =  (  { roles   } :AuthorizationRouteProps ) =>{
         
 
         const queryClient = useQueryClient()
-        const data = queryClient.getQueryData<User>([QUERIES.auth])
+        const data = queryClient.getQueryData<UsersType>([QUERIES.auth])
 
 
         if(!data) { 

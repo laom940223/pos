@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { QUERIES } from "../../consts/query-consts"
-import { User, defaultUser } from "../../consts/users"
+import { UsersType, defaultUser } from "../../consts/users"
 import { Outlet } from "react-router-dom"
 
 
@@ -10,7 +10,7 @@ export const AuthData = ()=>{
     
     
   const auth = useQuery([ QUERIES.auth ],()=>{
-    return new Promise<User | null>((resolve, reject) =>{
+    return new Promise<UsersType | null>((resolve, reject) =>{
 
         const timeout= setTimeout( ()=>{
 

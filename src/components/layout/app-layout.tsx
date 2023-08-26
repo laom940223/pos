@@ -5,6 +5,7 @@ import { Link, Outlet } from "react-router-dom"
 import { useState } from "react"
 
 import {
+  DollarOutlined,
     DownOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
@@ -25,20 +26,10 @@ export const AppLayout = ()=>{
       
 
       const items: MenuProps['items'] = [
+        
         {
-          label: <a href="https://www.antgroup.com">1st menu item</a>,
-          key: '0',
-        },
-        {
-          label: <a href="https://www.aliyun.com">2nd menu item</a>,
+          label: 'Log Out',
           key: '1',
-        },
-        {
-          type: 'divider',
-        },
-        {
-          label: '3rd menu item',
-          key: '3',
         },
       ];
 
@@ -55,12 +46,14 @@ export const AppLayout = ()=>{
                         {
                             key: '1',
                             icon: <UserOutlined />,
-                            label: <Link to ="/" > Test </Link>
+                            label: <Link to ="/users" > Users </Link>,
+                            
+
                         },
                         {
                             key: '2',
-                            icon: <VideoCameraOutlined />,
-                            label: <Link to ="/asdasdesa" > 3 </Link>
+                            icon: <DollarOutlined />,
+                            label: <Link to ="/sales" > Sales </Link>
                         },
                         {
                             key: '3',

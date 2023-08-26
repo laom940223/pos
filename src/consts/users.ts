@@ -1,14 +1,15 @@
 
 
-export type User = {
+export type UsersType = {
 
-
+    
     id:number;
     username: string;
     name:string;
     lastname:string;
     email:string
     role: string;
+    password? :string;
 
 }
 
@@ -22,7 +23,7 @@ export enum UserRoles {
     
 }
 
-export const defaultUser :User = {
+export const defaultUser :UsersType = {
 
 
     id: 258,
@@ -30,7 +31,7 @@ export const defaultUser :User = {
     name:"Misael",
     lastname:"Tester",
     email: "misatester@tester.com",
-    role: UserRoles.EMPLOYEE
+    role: UserRoles.ADMIN
 
 } 
 
