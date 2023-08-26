@@ -11,6 +11,7 @@ import {
     MenuUnfoldOutlined,
     UploadOutlined,
     UserOutlined,
+    VerticalAlignBottomOutlined,
     VideoCameraOutlined,
   } from '@ant-design/icons';
 
@@ -55,11 +56,33 @@ export const AppLayout = ()=>{
                             icon: <DollarOutlined />,
                             label: <Link to ="/sales" > Sales </Link>
                         },
+                       
                         {
                             key: '3',
                             icon: <UploadOutlined />,
-                            label: <Link to ="/" > Test ssaas</Link>
+                            label: "Products",
+                            children: [
+
+                                {
+                                    key: '55',
+                                    label: <Link to ="/products" > Items </Link>
+                                },
+
+                                {
+                                    key: '6',
+                                    label: <Link to ="/products/units" > Units </Link>
+                                }
+
+
+                            ]
                         },
+
+                        {
+                            key:"4",
+                            icon: <VerticalAlignBottomOutlined />,
+                            label:<Link to ="/providers" >Providers</Link>
+                        }
+
                         ]}
                     />
                 </Sider>

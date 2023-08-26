@@ -11,6 +11,9 @@ import { NotAuthorized } from './pages/not-authorized';
 import { AuthorizationRoute } from './components/auth/authorization-route';
 import { UserRoles } from './consts/users';
 import { UsersPage } from './pages/users';
+import { ProvidersPage } from './pages/providers';
+import { Sales } from './pages/sales';
+import { UnitsPage } from './pages/units';
 
 
 function App() {
@@ -37,6 +40,20 @@ function App() {
                             <Route path='/users'  >
                                 <Route path="" element={<UsersPage/>}/>
                                 <Route path='/users/:userId' element={<> user detail page </>} />
+                            </Route>
+
+
+                            <Route path='/sales' element={ <Sales/> }/>
+
+                            <Route path="/providers">
+                                <Route path="" element={ <ProvidersPage />}/>
+                            </Route>
+
+
+                            <Route path={"/products"}>
+
+                                <Route path='/products/units' element={<UnitsPage/>} />
+
                             </Route>
 
 
