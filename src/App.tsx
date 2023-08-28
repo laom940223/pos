@@ -12,8 +12,10 @@ import { AuthorizationRoute } from './components/auth/authorization-route';
 import { UserRoles } from './consts/users';
 import { UsersPage } from './pages/users';
 import { ProvidersPage } from './pages/providers';
-import { Sales } from './pages/sales';
+import {  Checkout } from './pages/checkout';
 import { UnitsPage } from './pages/units';
+import { ProductsPage } from './pages/products';
+import { ProductDetailPage } from './pages/product-detail';
 
 
 function App() {
@@ -43,15 +45,18 @@ function App() {
                             </Route>
 
 
-                            <Route path='/sales' element={ <Sales/> }/>
+                            <Route path='/checkout' element={ <Checkout/> }/>
 
                             <Route path="/providers">
+                                  
                                 <Route path="" element={ <ProvidersPage />}/>
                             </Route>
 
 
                             <Route path={"/products"}>
 
+                                <Route path={""} element={<ProductsPage/>}/>
+                                <Route path={"/products/:productId"}  element ={ <ProductDetailPage/> }/>
                                 <Route path='/products/units' element={<UnitsPage/>} />
 
                             </Route>

@@ -4,13 +4,13 @@ export type ProductType = {
     id: number,
     barcode?: string,
     name: string, 
-    description: string,
-    images?: string[],
+    description?: string,
+    image?: string,
     price: number,
     brand? : string,
     stock: number,
     unit: UnitType 
-
+    unitId?: string
 
 }
 
@@ -58,7 +58,7 @@ export const sampleUnits : UnitType[] = [
 
 
 
-export const defaultProducts:ProductType[]  = [
+export const sampleProducts:ProductType[]  = [
 
 
     {
@@ -68,12 +68,22 @@ export const defaultProducts:ProductType[]  = [
         description:"short description",
         price:25.35,
         stock:0,
-        unit:{
-            id:2,
-            name: "Pieza",
-            plural:"Pz"
-        }
+        unit:sampleUnits[1]
+
+    },
+
+
+    {
+
+        id:1,
+        name:"Tomate",
+        description:"short description",
+        price:25.69,
+        stock:0,
+        unit:sampleUnits[0]
 
     }
+
+
 
 ] 

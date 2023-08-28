@@ -2,13 +2,12 @@
 import { Button, Col, Popconfirm, Row, Space, Table,  Typography, notification } from 'antd'
 import { ColumnsType } from 'antd/es/table';
 
-import {  EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import {  DeleteOutlined, EditOutlined, PlusCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+
 import { useState } from 'react';
 
-import { ProviderType, sampleProviders } from '../consts/provider';
-import { AddEditProvider } from '../components/providers/add-edit-providers';
-import { ProductType, UnitType, sampleUnits } from '../consts/product-types';
+import { UnitType, sampleUnits } from '../consts/product-types';
+import { AddEditUnit } from '../components/products/add-edit-units';
 
 
 const { Text, Title  } = Typography
@@ -17,11 +16,17 @@ export const UnitsPage =()=>{
 
 
     const [open, setOpen] = useState(false);
-    const [selectedProvider, setSelectedProvider] = useState<UnitType>()
+    const [selectedUnit, setSelectedUnit] = useState<UnitType>()
 
     const [api, contextHolder] = notification.useNotification()
 
    
+    function handleConfirmDelete(){
+        
+
+        alert("Confirm delete")
+
+    }
     
 
 
@@ -32,7 +37,7 @@ export const UnitsPage =()=>{
     const onClose = () => {
         
       setOpen(false);
-      setSelectedProvider(undefined)
+      setSelectedUnit(undefined)
     };
 
 
@@ -41,7 +46,7 @@ export const UnitsPage =()=>{
         
         
         
-        // setSelectedProvider(sampleProviders.find(prov => prov.id === id))
+        setSelectedUnit(sampleUnits.find(prov => prov.id === id))
         showDrawer()
 
 
@@ -108,13 +113,13 @@ const columns: ColumnsType<UnitType> = [
         
         <Space size="middle">
             
-            <Link to={`/providers/${record.id}`}>
+            {/* <Link to={`/providers/${record.id}`}>
                 <Button type="link" icon={<PlusCircleOutlined />} size={"small"} />
-            </Link>
+            </Link> */}
 
             <Button type="link" onClick={()=>{ handleEdit(record.id) }} icon={<EditOutlined />}/>
 
-            {/* <Popconfirm
+            <Popconfirm
                 title="Delete the task"
                 description="Are you sure to delete this task?"
                 icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
@@ -122,7 +127,7 @@ const columns: ColumnsType<UnitType> = [
             
             >
                 <Button danger type='link' icon={<DeleteOutlined />}/>
-            </Popconfirm> */}
+            </Popconfirm>
             
             
         </Space>
@@ -142,7 +147,7 @@ const columns: ColumnsType<UnitType> = [
                     <Text> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Unde laboriosam in voluptates consequatur, nam harum eligendi voluptatibus dicta distinctio officia consequuntur facilis esse maxime quas veniam, quam excepturi nemo fuga!</Text>
 
                     <Col style={{marginTop:"1em"}}>
-                        <Button type='primary' onClick={showDrawer}>Add new </Button>
+                        <Button type='primary' icon={<PlusCircleOutlined/>} onClick={showDrawer}>Add new </Button>
                     </Col>
                     
             </Col>
@@ -152,7 +157,7 @@ const columns: ColumnsType<UnitType> = [
             
         
              <Col style={{ width:"100%", marginTop:"2em"}}>
-                {/* <AddEditProvider  open={open} onClose={onClose} providerToEdit={selectedProvider}  /> */}
+                <AddEditUnit  open={open} onClose={onClose} unitToEdit={selectedUnit}  />
                 <Table columns={columns} dataSource={sampleUnits}    rowKey={(record:UnitType) => `${record.id}`} />
              </Col>   
         </Row>
@@ -167,3 +172,4 @@ const columns: ColumnsType<UnitType> = [
 
 
 }
+

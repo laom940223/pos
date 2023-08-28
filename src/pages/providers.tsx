@@ -1,11 +1,9 @@
 
-import { Button, Col, Popconfirm, Row, Space, Table, Tag, Typography, notification } from 'antd'
+import { Button, Col, Row, Space, Table, Typography, notification } from 'antd'
 import { ColumnsType } from 'antd/es/table';
-import { UserRoles, UsersType } from '../consts/users';
-import { DeleteOutlined, DownloadOutlined, EditOutlined, MoreOutlined, PlusCircleOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { useState, useCallback } from 'react';
-import { AddEditUser } from '../components/users/add-edit-user';
+import { useState } from 'react';
 import { ProviderType, sampleProviders } from '../consts/provider';
 import { AddEditProvider } from '../components/providers/add-edit-providers';
 

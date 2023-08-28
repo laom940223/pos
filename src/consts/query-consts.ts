@@ -3,5 +3,9 @@
 
 export const  QUERIES = {
 
-    auth : "auth"
+    auth : "auth",
+    providers: "providers",
+    units:"units",
+    products:"products",
+    singleProduct: "single-product"
 }
