@@ -1,10 +1,11 @@
-import { Button, Checkbox, Col, Form, FormInstance, Input, Layout, Row } from "antd"
+import { Button, Checkbox, Col, Form, FormInstance, Input, Layout, Row, notification } from "antd"
 import { useState } from "react"
 import { Content } from "antd/es/layout/layout"
 import { ServerError } from "../consts/server-types";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERIES } from "../consts/query-consts";
 import { Navigate } from "react-router-dom";
+import { UsersType, defaultUser } from "../consts/users";
 
 
   
@@ -19,15 +20,58 @@ type FieldType = {
 
 export const Login = ()=>{
   
+    const [errors, setErrors] =  useState<ServerError[]>([])
     const queryClient  = useQueryClient()
     const data = queryClient.getQueryData([QUERIES.auth])
-    //replace with actual errors from server 
-    const [errors, setErrors] =  useState<ServerError[]>([])
+    
 
-    const onFinish = (values: any) => {
-        handleToggle()
-        console.log('Success:', values);
+    const [api, contextHolder] = notification.useNotification();
+
+    const mutation = useMutation<UsersType>(()=>{
+
+        console.log("Enterign mutation")
+
+        return new Promise<UsersType>((resolve)=>{
+            setTimeout(()=>{
+
+                resolve(defaultUser)
+            },100)
+
+        })
+    },
+    
+    
+    {
+            onSuccess: (user)=>{
+
+                console.log("Successfull mutation")
+                queryClient.setQueryData([QUERIES.auth], ()=>user)
+
+            },
+
+
+            onError:()=>{
+
+                api.error({
+                    message: `Something went wrong`,
+                    description:
+                      'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+                    placement:"bottomRight"
+                  })
+            }
+
+
+    }
+
+    )
+    
+
+    const onFinish = async(values: any) => {
+        // handleToggle()
         
+        await mutation.mutateAsync()
+
+        console.log(values)
       };
       
     const onFinishFailed = (errorInfo: any) => {
@@ -54,6 +98,8 @@ export const Login = ()=>{
    
 
 
+    console.log("DAta "+    data)
+
     if(data) {
 
         return <Navigate to="/" />
@@ -63,6 +109,7 @@ export const Login = ()=>{
 
         <Layout >
             <Content  >
+                {contextHolder}
                 <Row>
                     <Col span={24} style={{  display:"flex", justifyContent:"center", height:"100vh" }}>
                         <Form

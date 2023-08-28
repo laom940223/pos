@@ -31,3 +31,13 @@ export type ClientType ={
     
     
 }
+
+
+
+export const defaultClient: ClientType ={
+
+    id: 1,
+    name:"General public"
+
+
+}

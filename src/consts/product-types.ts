@@ -1,3 +1,4 @@
+import { ProductBasketType } from "../slices/carts-store"
 
 export type ProductType = {
 
@@ -87,3 +88,17 @@ export const sampleProducts:ProductType[]  = [
 
 
 ] 
+
+
+
+export const sampleBasketProducts = sampleProducts.map<ProductBasketType>(product=>({
+
+    id: product.id,
+    quantity:1,
+    name: product.name,
+    price: product.price,
+    unit: product.unit.name,
+    barcode: product.barcode
+
+
+}))

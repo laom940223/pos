@@ -34,7 +34,6 @@ function App() {
               <Route path="" element={<PrivateRoute />}>
                   <Route path="" element={<AppLayout/>}>
                         
-
                       <Route path='' element={
                           <AuthorizationRoute roles={[UserRoles.ADMIN]}/>
                         }>
@@ -60,8 +59,6 @@ function App() {
                                 <Route path='/products/units' element={<UnitsPage/>} />
 
                             </Route>
-
-
                         </Route>
 
 

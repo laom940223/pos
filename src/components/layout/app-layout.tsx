@@ -2,20 +2,26 @@ import { Avatar, Button, Col, Dropdown, Layout, Menu, MenuProps, Row, Space, the
 import Sider from "antd/es/layout/Sider"
 import { Content, Header } from "antd/es/layout/layout"
 import { Link, Outlet } from "react-router-dom"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 import {
   DollarOutlined,
-    DownOutlined,
+    
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     UploadOutlined,
     UserOutlined,
     VerticalAlignBottomOutlined,
-    VideoCameraOutlined,
+    
   } from '@ant-design/icons';
+import { useQueryClient } from "@tanstack/react-query"
+import { QUERIES } from "../../consts/query-consts"
 
 export const AppLayout = ()=>{
+
+
+
+    const queryClient = useQueryClient()
 
     const [collapsed, setCollapsed] = useState(false)
     const {
@@ -24,12 +30,21 @@ export const AppLayout = ()=>{
       } = theme.useToken();
 
 
-      
+
+      const handleLogOut = ()=> {
+
+        queryClient.invalidateQueries([QUERIES.auth])
+
+        console.log("asdas")
+      }
+
+               
 
       const items: MenuProps['items'] = [
         
         {
-          label: 'Log Out',
+          
+          label: <Button type="link" onClick={handleLogOut}>Log Out </Button>,
           key: '1',
         },
       ];

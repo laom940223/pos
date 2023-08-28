@@ -16,7 +16,7 @@ export const AuthData = ()=>{
 
             // console.log("Rejecting")
             // reject("Cause i want")
-            resolve(defaultUser)
+            resolve(null)
         } ,1000)
 
 
