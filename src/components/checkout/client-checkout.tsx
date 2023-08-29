@@ -79,7 +79,7 @@ export const ClientCheckout = ()=>{
             key:"2",
             label:"Change Client",
             labelStyle: { marginTop:"4px"},
-            children:   <Button type="text"  onClick={handleSelectClient} >{ `${!clientStore.client ? "Select a client" : "Change Client"}` }</Button>
+            children:   <Button type={`${!clientStore.client? "primary" : "text" }`}  onClick={handleSelectClient} >{ `${!clientStore.client ? "Select a client" : "Change Client"}` }</Button>
         }
         
       ];

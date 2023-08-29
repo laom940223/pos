@@ -1,4 +1,4 @@
-import { ProductBasketType } from "../slices/carts-store"
+
 
 export type ProductType = {
 
@@ -10,10 +10,12 @@ export type ProductType = {
     price: number,
     brand? : string,
     stock: number,
-    unit: UnitType 
-    unitId?: string
+    saleUnit: UnitType 
+    buynUnit?:UnitType
+    quantity?: number
+    
 
-}
+} 
 
 
 
@@ -23,7 +25,8 @@ export type UnitType ={
     id: number,
     name: string,
     plural:string,
-    abreviation?: string
+    abreviation: string
+    float: boolean
 }
 
 
@@ -35,9 +38,11 @@ export const sampleUnits : UnitType[] = [
 
     {
         id:1,
-        name: "Gram",
-        plural: "Grams",
-        abreviation: "g"
+        name: "kilogram",
+        plural: "kilograms",
+        abreviation: "kg",
+        float: true
+        
     },
 
     {
@@ -45,13 +50,15 @@ export const sampleUnits : UnitType[] = [
         name: "Piece",
         plural:"Pieces",
         abreviation:"Pz",
+        float: false
     },
 
     {
         id:3,
         name:"Box",
         plural:"Boxes",
-        abreviation:"box"
+        abreviation:"box",
+        float: false
     }
 
 ]
@@ -69,7 +76,7 @@ export const sampleProducts:ProductType[]  = [
         description:"short description",
         price:25.35,
         stock:0,
-        unit:sampleUnits[1]
+        saleUnit:sampleUnits[1]
 
     },
 
@@ -81,24 +88,20 @@ export const sampleProducts:ProductType[]  = [
         description:"short description",
         price:25.69,
         stock:0,
-        unit:sampleUnits[0]
+        saleUnit:sampleUnits[0]
 
+    },
+
+    {
+        id:2425,
+        name:"Platano",
+        description:"description",
+        price:15,
+        stock:0,
+        saleUnit:sampleUnits[0]
     }
 
 
 
 ] 
 
-
-
-export const sampleBasketProducts = sampleProducts.map<ProductBasketType>(product=>({
-
-    id: product.id,
-    quantity:1,
-    name: product.name,
-    price: product.price,
-    unit: product.unit.name,
-    barcode: product.barcode
-
-
-}))

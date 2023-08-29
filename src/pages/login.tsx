@@ -44,7 +44,7 @@ export const Login = ()=>{
     {
             onSuccess: (user)=>{
 
-                console.log("Successfull mutation")
+                
                 queryClient.setQueryData([QUERIES.auth], ()=>user)
 
             },

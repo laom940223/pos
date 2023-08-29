@@ -10,17 +10,19 @@ export const AuthData = ()=>{
     
     
   const auth = useQuery([ QUERIES.auth ],()=>{
+    
     return new Promise<UsersType | null>((resolve, reject) =>{
 
         const timeout= setTimeout( ()=>{
 
             // console.log("Rejecting")
             // reject("Cause i want")
-            resolve(null)
+            resolve(defaultUser)
+            clearTimeout(timeout)
         } ,1000)
 
 
-        return ()=>{  clearTimeout(timeout)}
+        // return ()=>{  clearTimeout(timeout)}
     })
 
 })
