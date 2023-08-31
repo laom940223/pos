@@ -10,11 +10,10 @@ export type ProductType = {
     price: number,
     brand? : string,
     stock: number,
-    saleUnit: UnitType 
-    buynUnit?:UnitType
-    quantity?: number
+    unit: UnitType 
     
-
+    
+    
 } 
 
 
@@ -26,7 +25,7 @@ export type UnitType ={
     name: string,
     plural:string,
     abreviation: string
-    float: boolean
+    fractional: boolean
 }
 
 
@@ -41,7 +40,7 @@ export const sampleUnits : UnitType[] = [
         name: "kilogram",
         plural: "kilograms",
         abreviation: "kg",
-        float: true
+        fractional: true
         
     },
 
@@ -50,7 +49,7 @@ export const sampleUnits : UnitType[] = [
         name: "Piece",
         plural:"Pieces",
         abreviation:"Pz",
-        float: false
+        fractional: false
     },
 
     {
@@ -58,7 +57,7 @@ export const sampleUnits : UnitType[] = [
         name:"Box",
         plural:"Boxes",
         abreviation:"box",
-        float: false
+        fractional: false
     }
 
 ]
@@ -76,7 +75,7 @@ export const sampleProducts:ProductType[]  = [
         description:"short description",
         price:25.35,
         stock:0,
-        saleUnit:sampleUnits[1]
+        unit:sampleUnits[1]
 
     },
 
@@ -88,7 +87,7 @@ export const sampleProducts:ProductType[]  = [
         description:"short description",
         price:25.69,
         stock:0,
-        saleUnit:sampleUnits[0]
+        unit:sampleUnits[0]
 
     },
 
@@ -98,7 +97,7 @@ export const sampleProducts:ProductType[]  = [
         description:"description",
         price:15,
         stock:0,
-        saleUnit:sampleUnits[0]
+        unit:sampleUnits[0]
     }
 
 

@@ -5,7 +5,7 @@ import { ServerError } from "../consts/server-types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERIES } from "../consts/query-consts";
 import { Navigate } from "react-router-dom";
-import { UsersType, defaultUser } from "../consts/users";
+import { UsersType, sampleUsers } from "../consts/users";
 
 
   
@@ -34,7 +34,7 @@ export const Login = ()=>{
         return new Promise<UsersType>((resolve)=>{
             setTimeout(()=>{
 
-                resolve(defaultUser)
+                resolve(sampleUsers)
             },100)
 
         })

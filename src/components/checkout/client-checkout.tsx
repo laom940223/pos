@@ -1,7 +1,7 @@
 import { AutoComplete, Button, Col, Descriptions, DescriptionsProps, Modal, Row } from "antd"
-import { useCartStore } from "../../slices/carts-store"
+import { useCartStore } from "../../slices/operation-store"
 import { useState } from "react"
-import { ClientType } from "../../consts/sales"
+import { ClientType } from "../../consts/operations"
 import { DefaultOptionType } from "antd/es/select"
 
 
@@ -93,7 +93,7 @@ export const ClientCheckout = ()=>{
             <Col>
                 
                 
-                    <Descriptions title="Client" items={items} /> 
+                    <Descriptions title="Client Details" items={items} /> 
                     
                     
                 

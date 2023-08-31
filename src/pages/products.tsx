@@ -133,7 +133,7 @@ const columns: ColumnsType<ProductType> = [
         render: (_, record)=>{
 
             
-            return record.saleUnit.name
+            return record.unit.name
         }
 
       },

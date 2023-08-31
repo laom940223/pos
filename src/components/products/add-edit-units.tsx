@@ -1,4 +1,4 @@
-import { Button, Col,  Drawer, Form, Input, Row,  } from "antd"
+import { Button, Checkbox, Col,  Drawer, Form, Input, Row,  } from "antd"
 
 import { useEffect } from "react";
 import { UnitType } from "../../consts/product-types";
@@ -95,6 +95,16 @@ export const AddEditUnit = ({ open, onClose, unitToEdit } :{ onClose: ()=>void, 
                 rules={[{ required: false, }]}
               >
                 <Input placeholder="Please enter an abreviation" />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+            <Form.Item
+                name="fractional"
+                valuePropName="checked"
+                // wrapperCol={{ offset: 8, span: 16 }}
+              >
+                <Checkbox>Is Fractional?</Checkbox>
               </Form.Item>
             </Col>
             

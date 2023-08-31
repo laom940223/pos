@@ -1,6 +1,6 @@
 
 import {  Typography } from "antd"
-import { ProductBasketType } from "../../slices/carts-store";
+import { ProductBasketType } from "../../slices/operation-store";
 
 const { Text } = Typography
 

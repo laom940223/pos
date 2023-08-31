@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { QUERIES } from "../../consts/query-consts"
-import { UsersType, defaultUser } from "../../consts/users"
+import { UsersType, sampleUsers } from "../../consts/users"
 import { Outlet } from "react-router-dom"
 
 
@@ -17,7 +17,7 @@ export const AuthData = ()=>{
 
             // console.log("Rejecting")
             // reject("Cause i want")
-            resolve(defaultUser)
+            resolve(sampleUsers[0])
             clearTimeout(timeout)
         } ,1000)
 

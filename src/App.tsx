@@ -12,10 +12,11 @@ import { AuthorizationRoute } from './components/auth/authorization-route';
 import { UserRoles } from './consts/users';
 import { UsersPage } from './pages/users';
 import { ProvidersPage } from './pages/providers';
-import {  Checkout } from './pages/checkout';
+import {  Sale } from './pages/sale';
 import { UnitsPage } from './pages/units';
 import { ProductsPage } from './pages/products';
 import { ProductDetailPage } from './pages/product-detail';
+import { VerifyCashierSession } from './components/operations/verify-cashier-session';
 
 
 function App() {
@@ -44,7 +45,17 @@ function App() {
                             </Route>
 
 
-                            <Route path='/checkout' element={ <Checkout/> }/>
+                            <Route path='/operations' element={<VerifyCashierSession/>}>
+
+                                    <Route path='/operations/sales' element={ <Sale/> }/>
+                                    <Route path='/operations/buy' element={
+
+                                        <>
+                                            Buys
+                                        </>
+                                    }/>
+
+                            </Route>
 
                             <Route path="/providers">
                                   

@@ -1,14 +1,15 @@
-import { useEffect, useRef, useState, useCallback, Ref, MutableRefObject } from "react"
-import { Button, Col, Form, InputNumber, Input, Row,  Typography, InputRef, Table, Space, Modal } from "antd"
-import { SaleSession } from "../consts/sales";
-
+import { useEffect, useRef, useState, useCallback } from "react"
+import { Button, Col, InputNumber, Input, Row,  Typography, InputRef, Table, Space, Modal } from "antd"
 import { ClientCheckout } from "../components/checkout/client-checkout";
 
-import {  useCartStore } from "../slices/carts-store";
+import {  useCartStore } from "../slices/operation-store";
 import {  ProductType, sampleProducts } from "../consts/product-types";
 import { ColumnsType } from "antd/es/table";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERIES } from "../consts/query-consts";
+
+import { OperationEnum, OperationType, ProductOperationDetail, RegisterSession } from "../consts/operations";
+
 
 
 const { Text, Title } = Typography
@@ -16,35 +17,39 @@ const { Search } = Input
 
 
 
-export const Checkout = ()=>{
+export const Sale = ()=>{
+
 
     const searchRef = useRef<InputRef>(null)
-    const floatProduct = useRef<ProductType>()
+    const decimalProduct = useRef<ProductType>()
     
     const [cash, setCash] = useState(0)
     const [searchProduct, setSearchProduct] = useState("")  
-    const [registerSession, setRegisterSession] = useState(false)
     const [isPaymentOpen, setIsPaymentOpen] = useState(false)
     const [isFloatOpen, setIsFloatOpen] = useState(false)
     const [productQuantity, setProductQuantity] = useState(0)
 
-    const [form] = Form.useForm<SaleSession>();
+    
     const { productsStore, client }  = useCartStore((state)=>({ productsStore : state.productStore, client: state.clientStore.client}))
     const queryClient = useQueryClient()
 
+    const registerSession = queryClient.getQueryData<RegisterSession>([QUERIES.registerSession])
+    
     let total = 0
+
+
+   
 
 
     
 
-    productsStore.products.forEach(( acc)=>{ total = total + (acc.price * acc.quantity!) })
+    productsStore.products.forEach((acc)=>{ total = total + (acc.product!.price * acc.quantity!) })
 
 
 
     const handlePaymentCancel = useCallback(()=>{
         setIsPaymentOpen(false)
     },[])
-
 
 
     const handleCashChange = useCallback((e: number | null)=>{
@@ -59,22 +64,25 @@ export const Checkout = ()=>{
         if(change < 0) return
 
 
-        
+            console.log({
+
+                id:1,
+                sessionId: registerSession?.id,
+                type:OperationEnum.SALE.toLocaleString(),
+                amount: +total.toFixed(2),
+                client,
+                products: productsStore.products
+
+            } as OperationType)
 
 
-        console.log({
-            
-            user: queryClient.getQueryData([QUERIES.auth]), 
-            client: client,
-            products: productsStore.products
-
-        })
+       
 
         productsStore.clearProducts()
         setCash(0)
         setIsPaymentOpen(false)
         
-    },[cash, productsStore, total, client, queryClient])
+    },[cash, total, registerSession?.id, client, productsStore.products])
 
 
     const handleFloatCancel = useCallback(()=>{
@@ -84,7 +92,7 @@ export const Checkout = ()=>{
     
     const handleFloatOk = useCallback ( ()=>{
 
-        productsStore.addProduct({...floatProduct.current!, quantity: productQuantity || 0})
+        productsStore.addProduct({product: {...decimalProduct.current! }, quantity: productQuantity || 0})
 
                
         setIsFloatOpen(false)
@@ -115,7 +123,7 @@ export const Checkout = ()=>{
     
     const handleIncrement = useCallback(
         (id: number) => {
-          productsStore.incrementProduct(id, 1)
+          productsStore.modifyQuantity(id, 1)
         },
         [productsStore],
       )
@@ -123,7 +131,7 @@ export const Checkout = ()=>{
 
       const handleDecrement= useCallback(
         (id: number) => {
-                productsStore.incrementProduct(id, -1)
+                productsStore.modifyQuantity(id, -1)
         },
         [productsStore],
       )
@@ -141,8 +149,8 @@ export const Checkout = ()=>{
             return
         }
         
-        if(!selectedProduct.saleUnit.float){
-                productsStore.addProduct({...selectedProduct, quantity :1})
+        if(!selectedProduct.unit.fractional){
+                productsStore.addProduct({product:{...selectedProduct}, quantity :1})
             setSearchProduct("")
             // setChangeProduct((prev)=>!prev )
             return
@@ -150,7 +158,7 @@ export const Checkout = ()=>{
 
        
        
-        floatProduct.current = selectedProduct
+        decimalProduct.current = selectedProduct
         setIsFloatOpen(true)  
         
         setSearchProduct("")
@@ -160,25 +168,18 @@ export const Checkout = ()=>{
 
 
 
-    const onFinish = (values: any) => {
-                console.log(values)
-        setRegisterSession(true)
-      };
-      
-    const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
-      };
+   
 
     
       useEffect(()=>{
         searchRef.current?.focus()   
-    },[productsStore.products, registerSession])
+    },[productsStore.products])
 
 
    
 
 
-    const columns: ColumnsType<ProductType> = [
+    const columns: ColumnsType<ProductOperationDetail> = [
         
         {
             title:"Quantity",
@@ -188,20 +189,20 @@ export const Checkout = ()=>{
                 
                 
                 
-                if(!record.saleUnit.float){
+                if(!record.product?.unit.fractional){
 
                     return (
                         <>
-                            <Button disabled={ record.quantity ===1} size="small" onClick={()=>{ handleDecrement(record.id)}}> - </Button>
-                                <Text style={{margin: "0 10px"}}>{`${record.quantity} ${record.saleUnit.abreviation}`} </Text>
-                            <Button size="small" onClick={()=>{ handleIncrement(record.id)}} > + </Button>
+                            <Button disabled={ record.quantity ===1} size="small" onClick={()=>{ handleDecrement(record.product!.id)}}> - </Button>
+                                <Text style={{margin: "0 10px"}}>{`${record.quantity} ${record.product!.unit.abreviation}`} </Text>
+                            <Button size="small" onClick={()=>{ handleIncrement(record.product!.id)}} > + </Button>
                         </>
                         )
                 }
 
                 return (
                     <>  
-                        <Text>{`${record.quantity!.toFixed(3)} ${record.saleUnit.abreviation}`}</Text>
+                        <Text>{`${record.quantity!.toFixed(3)} ${record.product?.unit.abreviation}`}</Text>
                         {/* <Button size="small"> Edit</Button> */}
                     </>
                 )
@@ -210,21 +211,21 @@ export const Checkout = ()=>{
         
         {
           title: 'Name',
-          dataIndex: 'name',
           key: 'name',
+          render: (_, record)=> record.product!.name
         },
 
         {
             title: 'Price',
-            dataIndex: 'price',
             key: 'price',
+            render: (_, record)=> record.product!.price
         },
 
 
         {
             title: 'Sub Total',
             key: 'price',
-            render: (_, record)=>`$${ (record.price * record.quantity!).toFixed(3) }`
+            render: (_, record)=>`$${ (record.product!.price * record.quantity!).toFixed(2) }`
         },
 
 
@@ -235,7 +236,7 @@ export const Checkout = ()=>{
           key: 'action',
           render: (_, record) => (
             <Space size="middle">
-              <Button type="text" danger onClick={()=>{handleDeleteItem(record.id) }}>  Delete</Button>
+              <Button type="text" danger onClick={()=>{handleDeleteItem(record.product!.id) }}>  Delete</Button>
               
             </Space>
           ),
@@ -249,78 +250,27 @@ export const Checkout = ()=>{
 
 
 
-      
+    if(!registerSession) return "Something went wrong"
 
 
 
-    if(!registerSession){
-
-
-        return    (           
-             <>
-                <Row style={{ marginBottom:"3em"}} >
-                    <Col>
-                            <Title>Open Register</Title>
-                            <Text>Before you can checkout please input the info below</Text>
-                    </Col>
-                </Row>
-
-                <Row>
-                    <Col span={24}>
-                        <Form 
-                        form={form}
-                        layout="vertical"
-                        initialValues={{ 
-                        }}
-
-                        onFinish={onFinish}
-                        onFinishFailed={onFinishFailed}
-                        autoComplete="off"
-                        style={{
-                            width:"100%"
-
-                        }}  
-                        >
-
-                        <Row gutter={16}>
-                            <Col span={12}>
-                            <Form.Item
-                            name="moneyInRegister"
-                            label="Cash available"
-
-                            rules={[{ required: true, type:"number" ,  message: 'Please enter a quantity' }]}
-                            >
-                                <InputNumber style={{width:"100%"}} placeholder="Please enter a quantity" />
-                            </Form.Item>
-                            </Col>
-                           
-                        </Row>
-
-
-                       
-
-
-                        <Row gutter={16}>
-                        <Col span={24} style={{display:"flex", justifyContent:"flex-end"}}>
-
-                        <Button htmlType="submit" type="primary">
-                        Submit
-                        </Button>
-                        </Col>
-                        </Row>
-
-                        </Form>
-                        </Col>
-                </Row>
-            
-            </>
-            )
-    }
-
-    console.log
+    
+    
 
     return (
         <>
+
+        <Row>
+            <Col span={24} style={{ display:"flex", justifyContent:"flex-end"}}>
+                    <Title level={4}> {registerSession.register.name} </Title>
+                    
+            </Col>
+
+            <Col span={24} style={{display:"flex", justifyContent:"flex-end"}}>
+                <Text>Opened at: {` ${registerSession.openTime.toLocaleDateString()} ${registerSession.openTime.toLocaleTimeString()}`}</Text>
+            </Col>
+        </Row>
+
 
         <Row>
             <Col >
@@ -349,7 +299,7 @@ export const Checkout = ()=>{
                 <Modal title="Please insert the value" open={isFloatOpen} onOk={handleFloatOk} onCancel={handleFloatCancel}>
                         <Row style={{width:"100%", marginTop:"1em"}}>
                             <Col span={24}>
-                                <Text style={{ fontSize:"1.5em" }} >{`${floatProduct.current?.name} ${floatProduct.current?.saleUnit.abreviation}`}</Text>
+                                <Text style={{ fontSize:"1.5em" }} >{`${decimalProduct.current?.name} ${decimalProduct.current?.unit.abreviation}`}</Text>
                             </Col>
                         </Row>
 
@@ -368,7 +318,7 @@ export const Checkout = ()=>{
             <Col span={24}>
 
                   
-                    <Table columns={columns} dataSource={productsStore.products} pagination={false}/>
+                    <Table columns={columns} dataSource={productsStore.products} pagination={false}  rowKey={(record)=>record.product!.id}/>
                 
             </Col>
         </Row>

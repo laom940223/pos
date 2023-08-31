@@ -69,7 +69,20 @@ export const AppLayout = ()=>{
                         {
                             key: '2',
                             icon: <DollarOutlined />,
-                            label: <Link to ="/Checkout" > Checkout </Link>
+                            label: "Operations",
+                            children:[
+                                
+                                {
+                                    key: '98',
+                                    label: <Link to ="/operations/sales" > Sales </Link>
+                                },
+
+                                {
+                                    key: '99',
+                                    label: <Link to ="/operations/buy" > Buying </Link>
+                                },
+                            ]
+
                         },
                        
                         {

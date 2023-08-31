@@ -7,5 +7,6 @@ export const  QUERIES = {
     providers: "providers",
     units:"units",
     products:"products",
-    singleProduct: "single-product"
+    singleProduct: "single-product",
+    registerSession: "register-session"
 }
