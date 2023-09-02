@@ -17,6 +17,8 @@ import { UnitsPage } from './pages/units';
 import { ProductsPage } from './pages/products';
 import { ProductDetailPage } from './pages/product-detail';
 import { VerifyCashierSession } from './components/operations/verify-cashier-session';
+import { Buys } from './pages/buys';
+import { Debounce } from './debounce';
 
 
 function App() {
@@ -48,19 +50,18 @@ function App() {
                             <Route path='/operations' element={<VerifyCashierSession/>}>
 
                                     <Route path='/operations/sales' element={ <Sale/> }/>
-                                    <Route path='/operations/buy' element={
-
-                                        <>
-                                            Buys
-                                        </>
-                                    }/>
+                                    <Route path='/operations/buy' element={<Buys/> } />
 
                             </Route>
 
                             <Route path="/providers">
                                   
                                 <Route path="" element={ <ProvidersPage />}/>
+                                <Route path="/providers/debounce" element={<Debounce/>}></Route>
                             </Route>
+
+
+                            
 
 
                             <Route path={"/products"}>

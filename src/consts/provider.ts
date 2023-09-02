@@ -19,8 +19,8 @@ export const sampleProviders: ProviderType[] = [
 
     {
         id:2,
-        name: "Coca Cola",
-        address:"Example adrees coca",
+        name: "Pepsi",
+        address:"Example adrees pepsi",
         
     }
 

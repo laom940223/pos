@@ -1,10 +1,9 @@
-import {useEffect, useState} from "react"
+
 import { Button, Col, Form, InputNumber, Row, Select, Spin, Typography } from "antd"
 import { Option } from "antd/es/mentions"
-import { Register, RegisterSession, registers, sampleregisterSession } from "../../consts/operations"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import {  RegisterSession, sampleregisterSession } from "../../consts/operations"
+import { useQuery } from "@tanstack/react-query"
 import { QUERIES } from "../../consts/query-consts"
-import { UsersType } from "../../consts/users"
 import { Outlet } from "react-router-dom"
 
 
@@ -21,13 +20,12 @@ export const VerifyCashierSession =  (   )=>{
     const [form] = Form.useForm();
     // const []
 
-    const queryClient= useQueryClient()
-    const user = queryClient.getQueryData<UsersType>([QUERIES.auth])
+    // const queryClient= useQueryClient()
+    // const user = queryClient.getQueryData<UsersType>([QUERIES.auth])
 
     
 
     const registerSession = useQuery<RegisterSession | null>( [QUERIES.registerSession], ()=>{
-         
         return new Promise<RegisterSession | null>((resolve)=>{
           const time=   setTimeout(()=>{
                 resolve(sampleregisterSession[0])
@@ -35,12 +33,14 @@ export const VerifyCashierSession =  (   )=>{
                 clearTimeout(time)
             }, 1500)
          })
-
     })
 
 
     const onFinish = (values: any) => {
         // setRegisterSession(  { id:125, openTime:new Date(), user, register: {name: values.register}, moneyAtOpen: values.moneyAtOpen,authorizedBy:undefined, closingTime:undefined, moneyAtClose:undefined  } as RegisterSession )
+
+        alert(JSON.stringify(values, null, 4))
+
     };
 
     const onFinishFailed = (errorInfo: any) => {

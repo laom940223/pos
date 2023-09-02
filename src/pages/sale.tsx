@@ -2,13 +2,15 @@ import { useEffect, useRef, useState, useCallback } from "react"
 import { Button, Col, InputNumber, Input, Row,  Typography, InputRef, Table, Space, Modal } from "antd"
 import { ClientCheckout } from "../components/checkout/client-checkout";
 
-import {  useCartStore } from "../slices/operation-store";
+import {  useOperationStore } from "../slices/operation-store";
 import {  ProductType, sampleProducts } from "../consts/product-types";
 import { ColumnsType } from "antd/es/table";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERIES } from "../consts/query-consts";
 
 import { OperationEnum, OperationType, ProductOperationDetail, RegisterSession } from "../consts/operations";
+import { AddBuyItem } from "../components/utils/add-buy-item";
+import { useDebounceValue } from "../hooks/use-debounce";
 
 
 
@@ -22,47 +24,54 @@ export const Sale = ()=>{
 
     const searchRef = useRef<InputRef>(null)
     const decimalProduct = useRef<ProductType>()
+
+    
+    
+
     
     const [cash, setCash] = useState(0)
     const [searchProduct, setSearchProduct] = useState("")  
+    const [isSearchResourceOpen, setIsSearchResourceOpen]= useState(false)
     const [isPaymentOpen, setIsPaymentOpen] = useState(false)
-    const [isFloatOpen, setIsFloatOpen] = useState(false)
+    const [isDecimalOpen, setIsDecimalOpen] = useState(false)
     const [productQuantity, setProductQuantity] = useState(0)
 
+    const debounceValue = useDebounceValue(searchProduct, 1000)
+
+
+    useEffect(()=>{
+        console.log(debounceValue)
+    },[debounceValue])
+
+    const { productsStore, client }  = useOperationStore((state)=>({ productsStore : state.saleStore, client: state.clientStore.client}))
     
-    const { productsStore, client }  = useCartStore((state)=>({ productsStore : state.productStore, client: state.clientStore.client}))
     const queryClient = useQueryClient()
 
     const registerSession = queryClient.getQueryData<RegisterSession>([QUERIES.registerSession])
     
     let total = 0
-
+    productsStore.products.forEach((acc)=>{ total = total + (acc.product!.price * acc.quantity!) })
 
    
 
 
-    
+    const handleSearchResourceOpen = useCallback(()=>{
+            setIsSearchResourceOpen(true)
+    },[])
 
-    productsStore.products.forEach((acc)=>{ total = total + (acc.product!.price * acc.quantity!) })
-
+    const handleSearchResourceCancel = useCallback(()=>{
+        setIsSearchResourceOpen(false)
+    },[])
 
 
     const handlePaymentCancel = useCallback(()=>{
         setIsPaymentOpen(false)
     },[])
 
-
-    const handleCashChange = useCallback((e: number | null)=>{
-
-        setCash(e? e : 0)
-    }, [])
-
-
     const handlePaymentOk = useCallback ( ()=>{
-
         const change = cash -total 
-        if(change < 0) return
 
+        if(change < 0) return
 
             console.log({
 
@@ -70,37 +79,38 @@ export const Sale = ()=>{
                 sessionId: registerSession?.id,
                 type:OperationEnum.SALE.toLocaleString(),
                 amount: +total.toFixed(2),
-                client,
+                provider: client,
                 products: productsStore.products
 
             } as OperationType)
-
-
-       
-
         productsStore.clearProducts()
         setCash(0)
         setIsPaymentOpen(false)
         
-    },[cash, total, registerSession?.id, client, productsStore.products])
+    },[cash, total, registerSession?.id, client, productsStore])
 
 
-    const handleFloatCancel = useCallback(()=>{
-        setIsFloatOpen(false)
+
+
+
+    const handleFractionalCancel = useCallback(()=>{
+        setIsDecimalOpen(false)
     },[])
 
     
-    const handleFloatOk = useCallback ( ()=>{
+    const handleFractionalOk = useCallback ( ()=>{
 
         productsStore.addProduct({product: {...decimalProduct.current! }, quantity: productQuantity || 0})
-
-               
-        setIsFloatOpen(false)
+        setIsDecimalOpen(false)
         setProductQuantity(0)
-        // setChangeProduct((prev)=>!prev )
         
     },[productQuantity, productsStore])
 
+
+    
+    const handleCashChange = useCallback((e: number | null)=>{
+        setCash(e? e : 0)
+    }, [])
 
 
     const handleProductQuantityChange = useCallback(
@@ -149,26 +159,18 @@ export const Sale = ()=>{
             return
         }
         
-        if(!selectedProduct.unit.fractional){
+        if(!selectedProduct.saleUnit.fractional){
                 productsStore.addProduct({product:{...selectedProduct}, quantity :1})
             setSearchProduct("")
             // setChangeProduct((prev)=>!prev )
             return
         }
 
-       
-       
         decimalProduct.current = selectedProduct
-        setIsFloatOpen(true)  
-        
+        setIsDecimalOpen(true)          
         setSearchProduct("")
 
     }
-
-
-
-
-   
 
     
       useEffect(()=>{
@@ -185,16 +187,13 @@ export const Sale = ()=>{
             title:"Quantity",
             key: "quantity",
             render: (_, record)=>{
-
-                
-                
-                
-                if(!record.product?.unit.fractional){
+         
+                if(!record.product?.saleUnit.fractional){
 
                     return (
                         <>
                             <Button disabled={ record.quantity ===1} size="small" onClick={()=>{ handleDecrement(record.product!.id)}}> - </Button>
-                                <Text style={{margin: "0 10px"}}>{`${record.quantity} ${record.product!.unit.abreviation}`} </Text>
+                                <Text style={{margin: "0 10px"}}>{`${record.quantity} ${record.product!.saleUnit.abreviation}`} </Text>
                             <Button size="small" onClick={()=>{ handleIncrement(record.product!.id)}} > + </Button>
                         </>
                         )
@@ -202,7 +201,7 @@ export const Sale = ()=>{
 
                 return (
                     <>  
-                        <Text>{`${record.quantity!.toFixed(3)} ${record.product?.unit.abreviation}`}</Text>
+                        <Text>{`${record.quantity!.toFixed(3)} ${record.product?.saleUnit.abreviation}`}</Text>
                         {/* <Button size="small"> Edit</Button> */}
                     </>
                 )
@@ -227,10 +226,7 @@ export const Sale = ()=>{
             key: 'price',
             render: (_, record)=>`$${ (record.product!.price * record.quantity!).toFixed(2) }`
         },
-
-
-
-        
+ 
         {
           title: 'Action',
           key: 'action',
@@ -269,6 +265,10 @@ export const Sale = ()=>{
             <Col span={24} style={{display:"flex", justifyContent:"flex-end"}}>
                 <Text>Opened at: {` ${registerSession.openTime.toLocaleDateString()} ${registerSession.openTime.toLocaleTimeString()}`}</Text>
             </Col>
+
+            <Col span={24} style={{display:"flex", justifyContent:"flex-end"}}>
+                <Text>Operated By: {`${registerSession.user.name} ${registerSession.user.lastname}`}</Text>
+            </Col>
         </Row>
 
 
@@ -288,7 +288,7 @@ export const Sale = ()=>{
                     disabled={ !client  }
                     ref={searchRef}
                     style={{ width:"40%"}}
-                    placeholder="Search a product"
+                    placeholder="Search by barcode"
                     enterButton
                     size="middle"
                     value={searchProduct}
@@ -296,16 +296,16 @@ export const Sale = ()=>{
                     onSearch={onSearchProduct}
                 />
 
-                <Modal title="Please insert the value" open={isFloatOpen} onOk={handleFloatOk} onCancel={handleFloatCancel}>
+                <Modal title="Please insert the value" open={isDecimalOpen} onOk={handleFractionalOk} onCancel={handleFractionalCancel}>
                         <Row style={{width:"100%", marginTop:"1em"}}>
                             <Col span={24}>
-                                <Text style={{ fontSize:"1.5em" }} >{`${decimalProduct.current?.name} ${decimalProduct.current?.unit.abreviation}`}</Text>
+                                <Text style={{ fontSize:"1.5em" }} >{`${decimalProduct.current?.name} ${decimalProduct.current?.saleUnit.abreviation}`}</Text>
                             </Col>
                         </Row>
 
                         <Row style={{marginTop:"1em", marginBottom:"1em"}} >
                             <Col span={24} >
-                                <InputNumber  value={productQuantity} onChange={handleProductQuantityChange}  style={{width:"100%"}} size="middle" placeholder="Insert quantity" onPressEnter={handleFloatOk}/>
+                                <InputNumber  value={productQuantity} onChange={handleProductQuantityChange}  style={{width:"100%"}} size="middle" placeholder="Insert quantity" onPressEnter={handleFractionalOk}/>
                             </Col>
                         </Row>
                         
@@ -314,13 +314,19 @@ export const Sale = ()=>{
             </Col>
         </Row>
 
-        <Row style={{marginTop:"2em", height:"60vh"}}>
-            <Col span={24}>
-
-                  
-                    <Table columns={columns} dataSource={productsStore.products} pagination={false}  rowKey={(record)=>record.product!.id}/>
-                
+        <Row>
+            <Col>
+                <Button disabled={!client} onClick={handleSearchResourceOpen}>Search produuct</Button>
+                <AddBuyItem barcode="/api/products" open={isSearchResourceOpen}  onCancel={handleSearchResourceCancel}  />
             </Col>
+        </Row>
+
+        <Row style={{marginTop:"2em", height:"50vh"}}>
+
+            <Col span={24}>
+                    <Table columns={columns} dataSource={productsStore.products} pagination={false}  rowKey={(record)=>record.product!.id}/>
+            </Col>
+
         </Row>
 
         <Row>

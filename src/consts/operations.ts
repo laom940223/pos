@@ -7,12 +7,14 @@ import { UsersType, sampleUsers } from "./users"
 export type RegisterSession = {
 
     id?: number, 
-    user: UsersType, 
+    user?: UsersType, 
+    userId?: number
     openTime: Date,
     closingTime?: Date
     moneyAtOpen: number
     moneyAtClose?: number
-    authorizedBy?: UsersType | number
+    authorizedOpenBy?: UsersType | number
+    authorizedCloseBy?: UsersType | number
     register: Register
     createdAt : Date
 
@@ -48,12 +50,24 @@ export type ProductOperationDetail = {
 
     id?:number
     operationId?: number,
-    quantity?:number,
-    salePrice?: number,
-    buyingPrice?: number,
-    product?: ProductType 
+    factor?: number,
+    type:string,
+    price?: number,
+    quantity: number,
+    product?: ProductType ,
+
+    salePrice1?: number,
+    salePrice2?: number,
+    salePrice3?: number,
+    
+
 }
 
+export enum ProductDetailType {
+
+    SALE ="SALE",
+    BUY= "BUY"
+}
 
 export enum OperationEnum {
 
