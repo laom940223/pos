@@ -60,7 +60,11 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
             form.setFieldValue("salePrice1", buysStore.products[index].salePrice1)
         }
 
-        if(product && index<0 ){ form.resetFields()}
+        if(product && index<0 ){ 
+        
+            form.resetFields()
+            form.setFieldValue("salePrice1", 1)
+        }
 
 
     },[product])
@@ -119,7 +123,7 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
         
         handleOk()
 
-    },[factorValue, buysStore, product, handleOk, index])
+    },[factorValue, buysStore, product, handleOk,])
 
 
     const onFormFinishFailed = useCallback((errorInfo:unknown)=>{
@@ -131,8 +135,8 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
     const items: DescriptionsProps['items'] = [
         {
           key: '1',
-          label: 'Name',
-          children: <p>{product?.name}</p>,
+          label: <Typography.Title>  </Typography.Title>,
+          children: <Typography.Text >{product?.name}</Typography.Text>,
         },
         {
           key: '2',
@@ -318,11 +322,11 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
                                     <Form.Item
                                     name="salePrice1"
                                     label={"Sale price 1"}
-                                    initialValue={priceByUnit * 1.2}
+                                    
                                     rules={[{ required: true,  message: 'Please enter a  valid price' }]}
                                     >
                                         <InputNumber
-                                                min={priceByUnit}
+                                                // min={priceByUnit}
                                                 precision={2}
                                             style={{ width:"100%" }} addonAfter={`x ${product?.saleUnit.abreviation}`} placeholder="Please enter a price" />
                                     </Form.Item>

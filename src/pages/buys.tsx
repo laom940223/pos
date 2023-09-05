@@ -14,6 +14,7 @@ import { ProviderBuys } from "../components/checkout/provider-buys";
 import { SearchProduct } from "../components/operations/search-products";
 import { ProductType, sampleProducts } from "../consts/product-types";
 import useNotification from "antd/es/notification/useNotification";
+import { useKeyPress } from "../hooks/use-key-press";
 
 
 
@@ -32,11 +33,17 @@ export const Buys = ()=>{
     const [searchProductOpen, setSearchProductOpen] = useState(false)
     const [barcode, setBarcode] = useState("") 
     const [selectedProduct, setSelectedProduct] = useState<ProductType | undefined| null>(null)
+    const [paymentOpen, setPaymentOpen] = useState(false)
+    const [cash, setCash] = useState(0)
 
     const { buyStore, provider }  = useOperationStore((state)=>({ buyStore : state.buyStore, provider: state.providerStore.provider}))
     
     const queryClient = useQueryClient()
     const registerSession = queryClient.getQueryData<RegisterSession>([QUERIES.registerSession])
+
+    let total = 0
+    buyStore.products.forEach((acc)=>{ total = total + (acc.price! * acc.quantity!) })
+
 
 
 
@@ -52,6 +59,7 @@ export const Buys = ()=>{
         })
     }, { enabled:false })
     
+
 
     const handleSearchProductCancel = useCallback(()=>{
         setSearchProductOpen(false)
@@ -80,7 +88,57 @@ export const Buys = ()=>{
 
    
     
+    const handlePayClick = useCallback(()=>{
+            setPaymentOpen(true)
+    },[])
 
+
+    const handlePaymentCancel = useCallback(()=>{
+
+
+        setPaymentOpen(false)
+
+    },[])
+
+
+
+    const handlePaymentOk = useCallback( ()=>{
+        
+
+        if(total!= cash){
+            api.error({
+                message:"The quantities must match",
+                
+            })
+            return
+        }
+
+
+        console.log({
+
+            sessionId:  queryClient.getQueryData<RegisterSession>([QUERIES.registerSession])?.id,
+            type: OperationEnum.BUY.toString(),
+            provider: provider,
+            id:1,
+            amount: cash,
+            products:buyStore.products,
+            
+
+
+        } as OperationType )
+
+
+        setCash(0)
+        setPaymentOpen(false)
+        buyStore.clearProducts()
+
+    },[total, cash, queryClient, provider, buyStore.products, api])
+
+
+    const handleCashChange = (value: number | null) =>{
+
+            setCash(value || 0)
+    }
 
 
     const handleDeleteItem = useCallback(
@@ -200,9 +258,7 @@ export const Buys = ()=>{
 
 
     
-    let total = 0
-    buyStore.products.forEach((acc)=>{ total = total + (acc.price! * acc.quantity!) })
-
+    
     return (
         <>
 
@@ -285,11 +341,11 @@ export const Buys = ()=>{
         <Row>
             <Col span={24} style={{display:"flex", justifyContent:"flex-end"}}>
 
-                    {/* <Button onClick={()=>{ setIsPaymentOpen(true)}} disabled={buyStore.products.length === 0} size="large" type="primary">
+                    <Button onClick={handlePayClick} disabled={buyStore.products.length === 0} size="large" type="primary">
                         Pay
-                    </Button> */}
+                    </Button> 
 
-                    {/* <Modal title="Payment" open={isPaymentOpen} 
+                     <Modal title="Payment" open={paymentOpen} 
                         onOk={handlePaymentOk} 
                         onCancel={handlePaymentCancel}
                         footer={[
@@ -314,20 +370,19 @@ export const Buys = ()=>{
                                         onChange={handleCashChange}
                                         onPressEnter={handlePaymentOk}
                                         name="cash" 
+                                        precision={2}
+                                        min={total}
                                         style={{width:"100%"   }} size="middle" 
                                         placeholder="Insert quantity"
+                                        
 
                                         />
                             </Col>
                         </Row>
 
-                        <Row style={{marginTop:"1em", marginBottom:"1em"}} >
-                            <Col span={24} >
-                                  <Text style={{ fontSize:"1.5em", textAlign:"center" }}>Change: {`${(cash - total).toFixed(2) }`}</Text>
-                            </Col>
-                        </Row>
+                            
                         
-                    </Modal> */}
+                    </Modal>
 
             </Col>
         </Row>

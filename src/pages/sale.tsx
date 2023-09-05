@@ -11,6 +11,7 @@ import { QUERIES } from "../consts/query-consts";
 import { OperationEnum, OperationType, ProductOperationDetail, RegisterSession } from "../consts/operations";
 import { AddBuyItem } from "../components/utils/add-buy-item";
 import { useDebounceValue } from "../hooks/use-debounce";
+import { SearchProduct } from "../components/operations/search-products";
 
 
 
@@ -36,12 +37,7 @@ export const Sale = ()=>{
     const [isDecimalOpen, setIsDecimalOpen] = useState(false)
     const [productQuantity, setProductQuantity] = useState(0)
 
-    const debounceValue = useDebounceValue(searchProduct, 1000)
-
-
-    useEffect(()=>{
-        console.log(debounceValue)
-    },[debounceValue])
+      
 
     const { productsStore, client }  = useOperationStore((state)=>({ productsStore : state.saleStore, client: state.clientStore.client}))
     
@@ -61,6 +57,28 @@ export const Sale = ()=>{
 
     const handleSearchResourceCancel = useCallback(()=>{
         setIsSearchResourceOpen(false)
+    },[])
+
+
+    const handleSearchSelect = useCallback((product:ProductType)=>{
+
+
+        if(!product.saleUnit.fractional){
+            productsStore.addProduct({ product, quantity :1, type:OperationEnum.SALE })
+        setSearchProduct("")
+        // setChangeProduct((prev)=>!prev )
+        setIsSearchResourceOpen(false)
+            return
+        }
+
+
+        decimalProduct.current = product
+        setIsSearchResourceOpen(false)
+        setIsDecimalOpen(true)          
+        setSearchProduct("")
+    
+
+
     },[])
 
 
@@ -128,8 +146,6 @@ export const Sale = ()=>{
       },
       [productsStore],
     )
-
-
     
     const handleIncrement = useCallback(
         (id: number) => {
@@ -160,7 +176,7 @@ export const Sale = ()=>{
         }
         
         if(!selectedProduct.saleUnit.fractional){
-                productsStore.addProduct({product:{...selectedProduct}, quantity :1})
+                productsStore.addProduct({product: selectedProduct, quantity :1, type:OperationEnum.SALE})
             setSearchProduct("")
             // setChangeProduct((prev)=>!prev )
             return
@@ -267,7 +283,7 @@ export const Sale = ()=>{
             </Col>
 
             <Col span={24} style={{display:"flex", justifyContent:"flex-end"}}>
-                <Text>Operated By: {`${registerSession.user.name} ${registerSession.user.lastname}`}</Text>
+                <Text>Operated By: {`${registerSession.user?.name} ${registerSession.user?.lastname}`}</Text>
             </Col>
         </Row>
 
@@ -317,7 +333,7 @@ export const Sale = ()=>{
         <Row>
             <Col>
                 <Button disabled={!client} onClick={handleSearchResourceOpen}>Search produuct</Button>
-                <AddBuyItem barcode="/api/products" open={isSearchResourceOpen}  onCancel={handleSearchResourceCancel}  />
+                <SearchProduct open={isSearchResourceOpen} onCancel={handleSearchResourceCancel} onSelect={handleSearchSelect} />
             </Col>
         </Row>
 

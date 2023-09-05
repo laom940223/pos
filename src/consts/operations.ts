@@ -71,9 +71,9 @@ export enum ProductDetailType {
 
 export enum OperationEnum {
 
-    SALE, 
-    BUY,
-    CASHOUT
+    SALE = "SALE", 
+    BUY="BUY",
+    CASHOUT="CASHOUT"
 
 }
 
