@@ -1,5 +1,5 @@
 
-import { Button, Col, Popconfirm, Row, Space, Table,  Typography, notification } from 'antd'
+import { Button, Col, Popconfirm, Row, Space, Spin, Table,  Typography, notification } from 'antd'
 import { ColumnsType } from 'antd/es/table';
 
 import {  DeleteOutlined, EditOutlined, PlusCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
@@ -8,6 +8,11 @@ import { useState } from 'react';
 
 import { UnitType, sampleUnits } from '../consts/product-types';
 import { AddEditUnit } from '../components/products/add-edit-units';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { QUERIES } from '../consts/query-consts';
+import axios from 'axios';
+import { API_URL } from '../consts/endpoints';
+import { ServerResponse } from '../consts/server-types';
 
 
 const { Text, Title  } = Typography
@@ -17,14 +22,52 @@ export const UnitsPage =()=>{
 
     const [open, setOpen] = useState(false);
     const [selectedUnit, setSelectedUnit] = useState<UnitType>()
-
     const [api, contextHolder] = notification.useNotification()
 
-   
-    function handleConfirmDelete(){
-        
+    const queryClient = useQueryClient()
 
-        alert("Confirm delete")
+
+    const productUnits = useQuery([QUERIES.units],async ()=>{
+
+
+
+        const response = await axios.get<ServerResponse<UnitType[]>>(API_URL+"product-unit")
+
+
+        return response.data
+    })
+
+
+
+    const deleteMutation = useMutation((id: number)=>{
+
+
+          return axios.delete<ServerResponse<string>>(API_URL+"product-unit/"+ id )
+
+    },{
+
+
+        onError:()=>{
+
+            api.error({
+               message:"Something went wrong try again later"
+            })
+
+        },
+
+        onSuccess:()=>{
+
+          queryClient.invalidateQueries([QUERIES.units])
+        }
+
+
+    })
+   
+    async function handleConfirmDelete(id: number){
+        
+        
+        await deleteMutation.mutateAsync(id)
+
 
     }
     
@@ -46,7 +89,7 @@ export const UnitsPage =()=>{
         
         
         
-        setSelectedUnit(sampleUnits.find(prov => prov.id === id))
+        setSelectedUnit(productUnits.data?.data.find(prov => prov.id === id))
         showDrawer()
 
 
@@ -96,10 +139,18 @@ const columns: ColumnsType<UnitType> = [
 
     {
       title: 'Abreviation',
-      dataIndex: 'abreviation',
+      dataIndex: 'abbreviation',
       key: 'abreviation',
     },
 
+    {
+      title: 'Fractional',
+      key: 'fractional',
+      render:(_, record)=>(
+
+          record.fractional ? "Yes" :"No"
+      )
+    },
     
 
 
@@ -123,7 +174,7 @@ const columns: ColumnsType<UnitType> = [
                 title="Delete the task"
                 description="Are you sure to delete this task?"
                 icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                onConfirm={handleConfirmDelete}
+                onConfirm={()=>{handleConfirmDelete(record.id)}}
             
             >
                 <Button danger type='link' icon={<DeleteOutlined />}/>
@@ -136,6 +187,14 @@ const columns: ColumnsType<UnitType> = [
   ];
 
 
+
+  if(productUnits.isLoading) return <Spin/>
+
+
+  if(productUnits.isError) return <>Something went wrong  </>
+
+
+  
 
   return (
     <>
@@ -158,7 +217,7 @@ const columns: ColumnsType<UnitType> = [
         
              <Col style={{ width:"100%", marginTop:"2em"}}>
                 <AddEditUnit  open={open} onClose={onClose} unitToEdit={selectedUnit}  />
-                <Table columns={columns} dataSource={sampleUnits}    rowKey={(record:UnitType) => `${record.id}`} />
+                <Table columns={columns} dataSource={productUnits.data.data}    rowKey={(record:UnitType) => `${record.id}`} />
              </Col>   
         </Row>
 

@@ -1,7 +1,12 @@
 import { Button, Checkbox, Col,  Drawer, Form, Input, Row,  } from "antd"
 
-import { useEffect } from "react";
-import { UnitType } from "../../consts/product-types";
+import { useEffect, useState } from "react";
+import { CreateUnit, UnitType } from "../../consts/product-types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios, { isAxiosError } from "axios";
+import { API_URL } from "../../consts/endpoints";
+import { ServerError, ServerResponse } from "../../consts/server-types";
+import { QUERIES } from "../../consts/query-consts";
 
 
 
@@ -11,6 +16,47 @@ import { UnitType } from "../../consts/product-types";
 
 
 export const AddEditUnit = ({ open, onClose, unitToEdit } :{ onClose: ()=>void, open :boolean, unitToEdit? : UnitType } )=>{
+
+
+    const [serverErrors, setServerErrors] = useState<ServerError[]>([])
+
+    const queryClient = useQueryClient()
+
+    const unitMutation  = useMutation((unit : CreateUnit)=>{
+        if(!unitToEdit) return axios.post<ServerResponse<UnitType>>(API_URL+"product-unit", unit)
+        return axios.put<ServerResponse<UnitType>>(API_URL+"product-unit/"+unitToEdit.id, unit)
+
+    },{
+      onError: (e)=>{
+
+
+        if(isAxiosError(e)){
+
+
+          if(e.response){
+
+              // setServerErrors(e.response.data.errors)
+              console.log(e.response.data)
+
+          }
+        }
+
+
+        console.log("Error")
+
+      },
+
+      onSuccess: ()=>{
+
+        queryClient.invalidateQueries([QUERIES.units])
+        form.resetFields()
+        onClose()
+
+      }
+
+
+
+    })
 
 
     const [form] = Form.useForm<UnitType>();
@@ -24,6 +70,9 @@ export const AddEditUnit = ({ open, onClose, unitToEdit } :{ onClose: ()=>void, 
       const onFinish = (values: any) => {
         // handleToggle()
         console.log('Success:', values);
+
+
+        unitMutation.mutate({...values})
         
       };
       
@@ -54,8 +103,8 @@ export const AddEditUnit = ({ open, onClose, unitToEdit } :{ onClose: ()=>void, 
                   
                   name: !unitToEdit ? "" : unitToEdit.name,
                   plural: !unitToEdit ? "" : unitToEdit.plural,
-                  abreviation: !unitToEdit? "": unitToEdit.abreviation
-
+                  abbreviation: !unitToEdit? "": unitToEdit.abbreviation,
+                  fractional:!unitToEdit ? false: unitToEdit.fractional 
                }}
                
               onFinish={onFinish}
@@ -70,6 +119,8 @@ export const AddEditUnit = ({ open, onClose, unitToEdit } :{ onClose: ()=>void, 
                 name="name"
                 label="Name"
                 
+                validateStatus={`${serverErrors.find( err => err.location === "name") ? "error" :"" }`}
+                help={ `${serverErrors.find( err => err.location === "name")?.message}`}
                 rules={[{ required: true, message: 'Please enter a name' }]}
               >
                 <Input placeholder="Please enter a name" />
@@ -90,7 +141,7 @@ export const AddEditUnit = ({ open, onClose, unitToEdit } :{ onClose: ()=>void, 
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="abreviation"
+                name="abbreviation"
                 label="Abreviation"
                 rules={[{ required: false, }]}
               >

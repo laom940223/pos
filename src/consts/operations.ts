@@ -129,3 +129,32 @@ export const sampleregisterSession: RegisterSession[] = [
 
     }
 ]
+
+
+
+export const sampleOpeations: OperationType[] =[
+
+
+    {
+        id:1,
+        sessionId: sampleregisterSession[0].id!,
+        amount:820,
+        type:"SALE"
+    },
+
+    {
+        id:2,
+        sessionId: sampleregisterSession[0].id!,
+        amount:250,
+        type:"BUY"
+    },
+
+    {
+        id:3, 
+        sessionId: sampleregisterSession[0].id!,
+        amount:580,
+        type:"SALE"
+
+    }
+
+]

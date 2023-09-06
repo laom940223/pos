@@ -1,24 +1,24 @@
 import { App as AntApp, Button, Layout } from 'antd';
 import { Route, Routes } from 'react-router-dom';
 import { PrivateRoute } from './components/auth/private-route';
-import { Login } from './pages/login';
+import { Login } from './pages/auth/login';
 import "./index.css"
 import "antd/dist/reset.css"
 import { AppLayout } from './components/layout/app-layout';
 import { AuthData } from './components/auth/auth-data';
-import { NotFound } from './pages/not-found';
-import { NotAuthorized } from './pages/not-authorized';
+import { NotFound } from './pages/errors/not-found';
+import { NotAuthorized } from './pages/errors/not-authorized';
 import { AuthorizationRoute } from './components/auth/authorization-route';
 import { UserRoles } from './consts/users';
 import { UsersPage } from './pages/users';
 import { ProvidersPage } from './pages/providers';
-import {  Sale } from './pages/sale';
+import {  Sale } from './pages/operations/sale';
 import { UnitsPage } from './pages/units';
 import { ProductsPage } from './pages/products';
 import { ProductDetailPage } from './pages/product-detail';
 import { VerifyCashierSession } from './components/operations/verify-cashier-session';
-import { Buys } from './pages/buys';
-import { Debounce } from './debounce';
+import { Buys } from './pages/operations/buys';
+import { CashOut } from './pages/operations/cash-out';
 
 
 function App() {
@@ -48,20 +48,16 @@ function App() {
 
 
                             <Route path='/operations' element={<VerifyCashierSession/>}>
-
+                                    
                                     <Route path='/operations/sales' element={ <Sale/> }/>
                                     <Route path='/operations/buy' element={<Buys/> } />
-
+                                    <Route path="/operations/cash-out" element={<CashOut/>}></Route>
                             </Route>
 
                             <Route path="/providers">
-                                  
                                 <Route path="" element={ <ProvidersPage />}/>
-                                <Route path="/providers/debounce" element={<Debounce/>}></Route>
+                                
                             </Route>
-
-
-                            
 
 
                             <Route path={"/products"}>

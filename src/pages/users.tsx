@@ -1,11 +1,16 @@
 
-import { Button, Col, Popconfirm, Row, Space, Table, Tag, Typography, notification } from 'antd'
+import { Button, Col, Popconfirm, Row, Space, Spin, Table, Tag, Typography, notification } from 'antd'
 import { ColumnsType } from 'antd/es/table';
 import { UserRoles, UsersType } from '../consts/users';
 import { DeleteOutlined, DownloadOutlined, EditOutlined, MoreOutlined, PlusCircleOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useState, useCallback } from 'react';
 import { AddEditUser } from '../components/users/add-edit-user';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { QUERIES } from '../consts/query-consts';
+import { ServerResponse } from '../consts/server-types';
+import axios from 'axios';
+import { API_URL } from '../consts/endpoints';
 
 const { Title, Text } = Typography
 
@@ -53,38 +58,65 @@ export const UsersPage =()=>{
     const [selectedUser, setSelectedUser] = useState<UsersType>()
 
     const [api, contextHolder] = notification.useNotification()
-
+    const queryClient = useQueryClient()
    
-    const handleConfirmDelete = useCallback(
-      async () => {
-        
 
-            try{
+    const  users = useQuery([QUERIES.users], async()=>{
 
-                const response = await fetch("https://swapi.dev/api/people")
-                const datos = await response.json()
-                // console.log(datos)
-                
-                api.success({
+        const response = await axios.get<ServerResponse<UsersType[]>>("http://localhost:8080/api/users")
+        return response.data.data
+    })
+
+
+    const deleteMutation = useMutation((id: number)=>{
+
+
+        return axios.delete<ServerResponse<unknown>>(API_URL+`users/${id}`)
+
+    }, {
+
+        onError:(e)=>{
+
+          api.error({
+                     
+                    message:"Something went wrong try again later",
+                    placement:"bottomRight"
+                })
+
+        },
+
+        onSuccess: ()=>{
+
+
+          api.success({
                      
                     message:"User deleted succesfully",
                     placement:"bottomRight"
                 })
 
+            
+          queryClient.invalidateQueries([QUERIES.users])
+            setOpen(false)
 
-            }catch(err){
 
-                api.error({
-                     
-                    message:"Something went wrong try again later",
-                    placement:"bottomRight"
-                })
-            }
+        }
 
-                
-                
+    })
+
+
+
     
-      },[api]
+
+    const handleConfirmDelete = useCallback(
+      async (id: number) => {
+        
+
+
+
+          await deleteMutation.mutateAsync(id)
+       
+    
+      },[deleteMutation]
     )
     
 
@@ -102,11 +134,7 @@ export const UsersPage =()=>{
 
     const handleEdit  = (id: number)=>{
 
-        
-        
-        
-        setSelectedUser(data.find(user => user.id ===id))
-
+        setSelectedUser(users.data?.find(user => user.id ===id))
         showDrawer()
 
 
@@ -203,7 +231,7 @@ const columns: ColumnsType<UsersType> = [
                 title="Delete the task"
                 description="Are you sure to delete this task?"
                 icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                onConfirm={handleConfirmDelete}
+                onConfirm={()=>{handleConfirmDelete(record.id)}}
             
             >
                 <Button danger type='link' icon={<DeleteOutlined />}/>
@@ -215,6 +243,10 @@ const columns: ColumnsType<UsersType> = [
     },
   ];
 
+
+  if(users.isLoading) return <Spin/>
+
+  if(users.isError) return <>Something went wrong</>
 
 
   return (
@@ -238,7 +270,7 @@ const columns: ColumnsType<UsersType> = [
         
              <Col style={{ width:"100%", marginTop:"2em"}}>
                 <AddEditUser  open={open} onClose={onClose} usertoEdit={selectedUser} />
-                <Table columns={columns} dataSource={data}    rowKey={(record:UsersType) => `${record.id}`} />
+                <Table columns={columns} dataSource={users.data}    rowKey={(record:UsersType) => `${record.id}`} />
              </Col>   
         </Row>
 

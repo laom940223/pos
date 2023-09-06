@@ -1,12 +1,73 @@
 import { Button, Col, DatePicker, Drawer, Form, Input, Row, Select, Space } from "antd"
 import { UserRoles, UsersType } from "../../consts/users";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { QUERIES } from "../../consts/query-consts";
+import axios, { isAxiosError } from "axios";
+import { ServerError, ServerResponse } from "../../consts/server-types";
+import { API_URL } from "../../consts/endpoints";
 const { Option } = Select;
 
 
 
 
 export const AddEditUser = ({ open, onClose, usertoEdit } :{ onClose: ()=>void, open :boolean, usertoEdit? : UsersType } )=>{
+
+
+    const queryClient = useQueryClient()
+    const [errors, setErrors] = useState<ServerError[]>([])
+
+
+    
+
+
+    const  mutateUser = useMutation((user: UsersType & { confirmPassword: string })=>{
+
+            if(!usertoEdit){
+              return axios.post<ServerResponse<UsersType>>("http://localhost:8080/api/users",user )
+            }
+
+            return axios.put<ServerResponse<UsersType>>(API_URL+"users/"+usertoEdit.id, user)
+        
+
+        },
+        
+        
+          {
+
+            onError:(e)=>{
+
+
+              if(isAxiosError(e)){
+
+
+                if(e.response?.data){
+
+                    const extract = e.response.data as ServerResponse<unknown>
+
+                  setErrors(extract.errors)
+
+                }
+              }
+
+
+
+              
+            },
+
+            onSuccess: ()=>{
+
+              queryClient.invalidateQueries([QUERIES.users])
+              onClose()
+              form.resetFields()
+            }
+
+
+          }
+        )
+
+
+    
 
 
     const [form] = Form.useForm<UsersType>();
@@ -19,7 +80,10 @@ export const AddEditUser = ({ open, onClose, usertoEdit } :{ onClose: ()=>void, 
 
       const onFinish = (values: any) => {
         // handleToggle()
-        console.log('Success:', values);
+        
+
+        mutateUser.mutate(values)
+        setErrors([])
         
       };
       
@@ -50,7 +114,7 @@ export const AddEditUser = ({ open, onClose, usertoEdit } :{ onClose: ()=>void, 
                   username: !usertoEdit ? "" : usertoEdit.username,
                   email: !usertoEdit ? "" : usertoEdit.email,
                   name: !usertoEdit ? "" : usertoEdit.name,
-                  lastName:  !usertoEdit ? "" : usertoEdit.lastname,
+                  lastname:  !usertoEdit ? "" : usertoEdit.lastname,
 
                }}
                
@@ -66,9 +130,17 @@ export const AddEditUser = ({ open, onClose, usertoEdit } :{ onClose: ()=>void, 
                 name="username"
                 label="Username"
                 
+                validateStatus={`${errors.find(field => field.location === "username") ? "error" : "" }`}
+                help={ errors.find(field => field.location ==="username")?.message}
+
+
                 rules={[{ required: true, message: 'Please enter username' }]}
+
+
               >
-                <Input placeholder="Please enter a username" />
+                <Input
+                    disabled={!!usertoEdit}
+                  placeholder="Please enter a username" />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -76,8 +148,13 @@ export const AddEditUser = ({ open, onClose, usertoEdit } :{ onClose: ()=>void, 
                 name="email"
                 label="Email"
                 rules={[{ required: true, type:"email" ,  message: 'Please enter a valid email' }]}
+                validateStatus={`${errors.find(field => field.location === "email") ? "error" : "" }`}
+                help={ errors.find(field => field.location ==="email")?.message}
+
               >
-                <Input  placeholder="Please enter an email" />
+                <Input  
+                  disabled={!!usertoEdit}
+                  placeholder="Please enter an email" />
               </Form.Item>
             </Col>
           </Row>
@@ -95,7 +172,7 @@ export const AddEditUser = ({ open, onClose, usertoEdit } :{ onClose: ()=>void, 
             </Col>
             <Col span={12}>
             <Form.Item
-                name="lastName"
+                name="lastname"
                 label="Last Name"
                 rules={[{ required: true, message: 'Please enter user last name' }]}
               >
@@ -118,11 +195,16 @@ export const AddEditUser = ({ open, onClose, usertoEdit } :{ onClose: ()=>void, 
                 <Input.Password placeholder="Please enter a password" />
               </Form.Item>
             </Col>
+
             <Col span={12}>
             <Form.Item
-                name="cPassword"
+                name="confirmPassword"
                 label="Confirm Password"
+                validateStatus={`${errors.find(field => field.location === "confirmPassword") ? "error" : "" }`}
+                help={ errors.find(field => field.location ==="confirmPassword")?.message}
+
                 rules={[{ required: true, message: 'Please enter a password' }]}
+
               >
                 <Input.Password placeholder="Please confirm the password" />
               </Form.Item>

@@ -2,7 +2,7 @@
 
 
 
-import { Button, Col, Popconfirm, Row, Space, Table, Tag, Typography, notification } from 'antd'
+import { Button, Col, Popconfirm, Row, Space, Spin, Table, Tag, Typography, notification } from 'antd'
 import { ColumnsType } from 'antd/es/table';
 import { UserRoles, UsersType } from '../consts/users';
 import { DeleteOutlined, DownloadOutlined, EditOutlined, MoreOutlined, PlusCircleOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
@@ -11,6 +11,11 @@ import { useState, useCallback } from 'react';
 import { AddEditUser } from '../components/users/add-edit-user';
 import { ProductType, sampleProducts } from '../consts/product-types';
 import { AddEditProduct } from '../components/products/add-edit-products';
+import { useQuery } from '@tanstack/react-query';
+import { QUERIES } from '../consts/query-consts';
+import axios from 'axios';
+import { API_URL } from '../consts/endpoints';
+import { ServerResponse } from '../consts/server-types';
 
 const { Title, Text } = Typography
 
@@ -25,6 +30,18 @@ export const ProductsPage =()=>{
     const [selectedProduct, setSelectedProduct] = useState<ProductType>()
 
     const [api, contextHolder] = notification.useNotification()
+
+
+
+    const productsQuery = useQuery([QUERIES.products], async ()=>{
+
+
+          const response = await axios.get<ServerResponse<ProductType[]>>(API_URL+"products")
+
+          return response.data
+
+    })
+
 
    
     const handleConfirmDelete = useCallback(
@@ -113,13 +130,13 @@ const columns: ColumnsType<ProductType> = [
       
     },
 
-    {
+    // {
 
-        title:"Price",
-        dataIndex:"price",
-        key:"price",
+    //     title:"Price",
+    //     dataIndex:"price",
+    //     key:"price",
 
-      },
+    //   },
 
     {
       title: 'Stock',
@@ -175,6 +192,12 @@ const columns: ColumnsType<ProductType> = [
 
 
 
+
+  if(productsQuery.isLoading) return <Spin/>
+
+
+  if(productsQuery.isError) return <>Something went wrong try again later</>
+
   return (
     <>
 
@@ -196,7 +219,7 @@ const columns: ColumnsType<ProductType> = [
         
              <Col style={{ width:"100%", marginTop:"2em"}}>
                 <AddEditProduct  open={open} onClose={onClose}  />
-                <Table columns={columns} dataSource={sampleProducts}    rowKey={(record:ProductType) => `${record.id}`} />
+                <Table columns={columns} dataSource={productsQuery.data.data}    rowKey={(record:ProductType) => `${record.id}`} />
              </Col>   
         </Row>
 

@@ -1,8 +1,15 @@
-import { Button, Col, Drawer, Form, Input, Row, Select, Upload } from "antd"
-import { UserRoles, UsersType } from "../../consts/users";
+import { Button, Col, Drawer, Form, Input, Row, Select, Spin, Upload } from "antd"
 import { useEffect } from "react";
-import { ProductType, sampleUnits } from "../../consts/product-types";
-import { UploadOutlined } from "@ant-design/icons";
+import { CreateProduct, CreateUnit, ProductType, UnitType, sampleUnits } from "../../consts/product-types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { QUERIES } from "../../consts/query-consts";
+import axios, { isAxiosError } from "axios";
+import { API_URL } from "../../consts/endpoints";
+import { ServerResponse } from "../../consts/server-types";
+
+
+
+
 const { Option } = Select;
 
 const normFile = (e: any) => {
@@ -19,15 +26,65 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
 
     const [form] = Form.useForm<ProductType>();
 
+    const queryClient = useQueryClient()
+
+
+    const unitsQuery = useQuery([QUERIES.productunitoptions], async()=>{
+
+            const resaxios = await axios.get<ServerResponse<UnitType[]>>(API_URL+"product-unit")
+            return resaxios.data
+
+    })
+
+
+    const productMutation = useMutation((product : CreateProduct)=>{
+
+
+          return axios.post<ServerResponse<UnitType>>(API_URL+"products", product)
+        
+
+    }, {
+
+      onError:(e)=>{
+
+          if(isAxiosError(e)){
+
+            console.log(e.response?.data.errors)
+          }
+
+      },
+
+
+      onSuccess: ()=>{
+
+          queryClient.invalidateQueries([QUERIES.products])
+          
+          form.resetFields()
+          onClose()
+        
+      }
+
+
+    })
+
+
+
+
       useEffect(()=>{
 
         form.resetFields()
 
       }, [productToEdit, form])
 
+
+
+
+
       const onFinish = (values: any) => {
         // handleToggle()
         console.log('Success:', values);
+
+        productMutation.mutate(values)
         
       };
       
@@ -36,8 +93,16 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
       };
 
 
+    
+      let unitsOptions:JSX.Element[] = []
+
+      if(!unitsQuery.isLoading && !unitsQuery.isError){
+
+          unitsOptions = unitsQuery.data.data.map((unit)=><Option key={unit.id} value={unit.id}>{unit.name}</Option>) 
+      }
       
 
+      // console.log(unitsQuery.data?.data)
       
 
     return (
@@ -59,10 +124,11 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
 
                   name: !productToEdit ? "" : productToEdit.name,
                   barcode: !productToEdit ? "" : productToEdit.barcode,
-                  brand: !productToEdit ? "" : productToEdit.brand,
+                  
                 //   image:  !productToEdit ? "" : productToEdit.image,
                   description: !productToEdit ? "" : productToEdit.description,
-                  unitS: !productToEdit ? "" : productToEdit.unitS
+                  buyUnit: !productToEdit ? "" : productToEdit.buyUnit.name,
+                  saleUnit: !productToEdit ? "" : productToEdit.saleUnit.name
 
                }}
                
@@ -99,21 +165,40 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
            
             <Col span={12}>
               <Form.Item
-                name="unitS"
-                label="Unit"
+                name="buyUnit"
+                label="Buy unit"
                 rules={[{ required: true, message: 'Please choose the unit' }]}
                 // initialValue={  !productToEdit ? "" : productToEdit.role}
               >
                 <Select placeholder="Please choose the unit">
 
                     {
-                        sampleUnits.map((unit)=><Option key={unit.id} value={unit.id}>{unit.name}</Option>  )
+                        unitsOptions
                     }
                         
                   
                 </Select>
               </Form.Item>
             </Col>
+
+            <Col span={12}>
+              <Form.Item
+                name="saleUnit"
+                label="Sale unit"
+                rules={[{ required: true, message: 'Please choose the unit' }]}
+                // initialValue={  !productToEdit ? "" : productToEdit.role}
+              >
+                <Select placeholder="Please choose the unit">
+
+                    {
+                      unitsOptions
+                    }
+                        
+                  
+                </Select>
+              </Form.Item>
+            </Col>
+
           </Row>
 
 

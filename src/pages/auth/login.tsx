@@ -1,11 +1,11 @@
 import { Button, Checkbox, Col, Form, FormInstance, Input, Layout, Row, notification } from "antd"
 import { useState } from "react"
 import { Content } from "antd/es/layout/layout"
-import { ServerError } from "../consts/server-types";
+import { ServerError } from "../../consts/server-types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { QUERIES } from "../consts/query-consts";
+import { QUERIES } from "../../consts/query-consts";
 import { Navigate } from "react-router-dom";
-import { UsersType, sampleUsers } from "../consts/users";
+import { UsersType, sampleUsers } from "../../consts/users";
 
 
   

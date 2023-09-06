@@ -2,19 +2,19 @@ import { useEffect, useRef, useState, useCallback } from "react"
 import { Button, Col, InputNumber, Input, Row,  Typography, InputRef, Table, Space, Modal } from "antd"
     
 
-import {  useOperationStore } from "../slices/operation-store";
+import {  useOperationStore } from "../../slices/operation-store";
 
 import { ColumnsType } from "antd/es/table";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { QUERIES } from "../consts/query-consts";
+import { QUERIES } from "../../consts/query-consts";
 
-import { OperationEnum, OperationType, ProductOperationDetail, RegisterSession } from "../consts/operations";
-import { AddBuyItem } from "../components/utils/add-buy-item";
-import { ProviderBuys } from "../components/checkout/provider-buys";
-import { SearchProduct } from "../components/operations/search-products";
-import { ProductType, sampleProducts } from "../consts/product-types";
+import { OperationEnum, OperationType, ProductOperationDetail, RegisterSession } from "../../consts/operations";
+import { AddBuyItem } from "../../components/utils/add-buy-item";
+import { ProviderBuys } from "../../components/checkout/provider-buys";
+import { SearchProduct } from "../../components/operations/search-products";
+import { ProductType, sampleProducts } from "../../consts/product-types";
 import useNotification from "antd/es/notification/useNotification";
-import { useKeyPress } from "../hooks/use-key-press";
+
 
 
 

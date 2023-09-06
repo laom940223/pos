@@ -17,15 +17,19 @@ export type ProductType = {
 } 
 
 
+export type CreateProduct = Omit<ProductType, "id">
+
 
 export type UnitType ={
 
     id: number,
     name: string,
     plural:string,
-    abreviation: string
+    abbreviation: string
     fractional: boolean
 }
+
+export type CreateUnit =  Omit<UnitType,"id">
 
 
 
@@ -38,7 +42,7 @@ export const sampleUnits : UnitType[] = [
         id:1,
         name: "kilogram",
         plural: "kilograms",
-        abreviation: "kg",
+        abbreviation: "kg",
         fractional: true
         
     },
@@ -47,7 +51,7 @@ export const sampleUnits : UnitType[] = [
         id:2,
         name: "Piece",
         plural:"Pieces",
-        abreviation:"Pz",
+        abbreviation:"Pz",
         fractional: false
     },
 
@@ -55,7 +59,7 @@ export const sampleUnits : UnitType[] = [
         id:3,
         name:"Box",
         plural:"Boxes",
-        abreviation:"box",
+        abbreviation:"box",
         fractional: false
     },
 
@@ -63,7 +67,7 @@ export const sampleUnits : UnitType[] = [
         id: 4, 
         name:"Costal",
         plural:"Costales",
-        abreviation:"Cost",
+        abbreviation:"Cost",
         fractional:false
 
     }

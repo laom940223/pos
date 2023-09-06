@@ -1,17 +1,16 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { Button, Col, InputNumber, Input, Row,  Typography, InputRef, Table, Space, Modal } from "antd"
-import { ClientCheckout } from "../components/checkout/client-checkout";
+import { ClientCheckout } from "../../components/checkout/client-checkout";
 
-import {  useOperationStore } from "../slices/operation-store";
-import {  ProductType, sampleProducts } from "../consts/product-types";
+import {  useOperationStore } from "../../slices/operation-store";
+import {  ProductType, sampleProducts } from "../../consts/product-types";
 import { ColumnsType } from "antd/es/table";
 import { useQueryClient } from "@tanstack/react-query";
-import { QUERIES } from "../consts/query-consts";
+import { QUERIES } from "../../consts/query-consts";
 
-import { OperationEnum, OperationType, ProductOperationDetail, RegisterSession } from "../consts/operations";
-import { AddBuyItem } from "../components/utils/add-buy-item";
-import { useDebounceValue } from "../hooks/use-debounce";
-import { SearchProduct } from "../components/operations/search-products";
+import { OperationEnum, OperationType, ProductOperationDetail, RegisterSession } from "../../consts/operations";
+
+import { SearchProduct } from "../../components/operations/search-products";
 
 
 
@@ -209,7 +208,7 @@ export const Sale = ()=>{
                     return (
                         <>
                             <Button disabled={ record.quantity ===1} size="small" onClick={()=>{ handleDecrement(record.product!.id)}}> - </Button>
-                                <Text style={{margin: "0 10px"}}>{`${record.quantity} ${record.product!.saleUnit.abreviation}`} </Text>
+                                <Text style={{margin: "0 10px"}}>{`${record.quantity} ${record.product!.saleUnit.abbreviation}`} </Text>
                             <Button size="small" onClick={()=>{ handleIncrement(record.product!.id)}} > + </Button>
                         </>
                         )
@@ -217,7 +216,7 @@ export const Sale = ()=>{
 
                 return (
                     <>  
-                        <Text>{`${record.quantity!.toFixed(3)} ${record.product?.saleUnit.abreviation}`}</Text>
+                        <Text>{`${record.quantity!.toFixed(3)} ${record.product?.saleUnit.abbreviation}`}</Text>
                         {/* <Button size="small"> Edit</Button> */}
                     </>
                 )
@@ -315,7 +314,7 @@ export const Sale = ()=>{
                 <Modal title="Please insert the value" open={isDecimalOpen} onOk={handleFractionalOk} onCancel={handleFractionalCancel}>
                         <Row style={{width:"100%", marginTop:"1em"}}>
                             <Col span={24}>
-                                <Text style={{ fontSize:"1.5em" }} >{`${decimalProduct.current?.name} ${decimalProduct.current?.saleUnit.abreviation}`}</Text>
+                                <Text style={{ fontSize:"1.5em" }} >{`${decimalProduct.current?.name} ${decimalProduct.current?.saleUnit.abbreviation}`}</Text>
                             </Col>
                         </Row>
 

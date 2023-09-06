@@ -231,7 +231,7 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
                             >
                                 <InputNumber
                                     precision={ product?.buyUnit.fractional ? 2 : 0}
-                                    addonAfter={product?.buyUnit.abreviation}
+                                    addonAfter={product?.buyUnit.abbreviation}
                                     style={{width: "100%"}} placeholder="Please enter a quantity" />
                             
                             </Form.Item>
@@ -262,7 +262,7 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
                                 >
                                     <InputNumber
                                         
-                                        style={{ width:"100%" }} addonAfter={`x ${product?.buyUnit.abreviation}`} placeholder="Please enter a price" />
+                                        style={{ width:"100%" }} addonAfter={`x ${product?.buyUnit.abbreviation}`} placeholder="Please enter a price" />
                                 </Form.Item>
                             </Col>
 
@@ -286,7 +286,7 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
                                 <Row>
                                     <Col span={24}> Precios de compra </Col>
                                     <Col span={12}>
-                                        {`${  priceValue  } x ${product?.buyUnit.abreviation} `}
+                                        {`${  priceValue  } x ${product?.buyUnit.abbreviation} `}
                                     </Col>
 
                                     <Col span={12}>
@@ -328,7 +328,7 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
                                         <InputNumber
                                                 // min={priceByUnit}
                                                 precision={2}
-                                            style={{ width:"100%" }} addonAfter={`x ${product?.saleUnit.abreviation}`} placeholder="Please enter a price" />
+                                            style={{ width:"100%" }} addonAfter={`x ${product?.saleUnit.abbreviation}`} placeholder="Please enter a price" />
                                     </Form.Item>
 
                                     <Col>
@@ -350,7 +350,7 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
                                     >
                                         <InputNumber
                                             
-                                            style={{ width:"100%" }} addonAfter={`x ${product?.saleUnit.abreviation}`} placeholder="Please enter a price" />
+                                            style={{ width:"100%" }} addonAfter={`x ${product?.saleUnit.abbreviation}`} placeholder="Please enter a price" />
                                     </Form.Item>
                                 </Col>
 
@@ -363,7 +363,7 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
                                     >
                                         <InputNumber
                                             
-                                            style={{ width:"100%" }} addonAfter={`x ${product?.saleUnit.abreviation}`} placeholder="Please enter a price" />
+                                            style={{ width:"100%" }} addonAfter={`x ${product?.saleUnit.abbreviation}`} placeholder="Please enter a price" />
                                     </Form.Item>
                                 </Col>
 
