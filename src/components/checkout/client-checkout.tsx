@@ -1,8 +1,14 @@
 import { AutoComplete, Button, Col, Descriptions, DescriptionsProps, Modal, Row } from "antd"
 import { useOperationStore } from "../../slices/operation-store"
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { ClientType } from "../../consts/operations"
 import { DefaultOptionType } from "antd/es/select"
+import { useQuery } from "@tanstack/react-query"
+import { QUERIES } from "../../consts/query-consts"
+import axios from "axios"
+import { API_URL } from "../../consts/endpoints"
+import { useDebounceValue } from "../../hooks/use-debounce"
+import { ServerResponse } from "../../consts/server-types"
 
 
 
@@ -33,14 +39,43 @@ export const ClientCheckout = ()=>{
 
     const { clientStore } = useOperationStore((state)=> ({ clientStore:  state.clientStore}))
     const [isModalOpen, setIsModalOpen] = useState(false)
-
     const [selectedValue, setSelectedValue ] = useState<string | undefined>()
+
+    const [query, setQuery] = useState("")
+
+    const debouncedValue= useDebounceValue(query,100)
+
+
+    const clientsQuery = useQuery([QUERIES.SEARCH_CLIENTS_BY_NAME],async ()=>{
+
+        const response = await axios.post<ServerResponse<ClientType[]>>(API_URL+"clients/search?query="+debouncedValue)
+        return response.data.data
+
+    }, { enabled: false} )
+
+
+
+    const reFetch = useCallback(async()=>{
+
+         clientsQuery.refetch()
+
+        
+    },[clientsQuery]) 
+
+    useEffect(() => {
+      
+        // console.log(debouncedValue)
+        reFetch()
+        
+      
+    }, [debouncedValue, reFetch])
+    
 
 
     const handleConfirm = ()=>{
 
         setIsModalOpen(false)
-        clientStore.setClient( clients.find(client=> client.name === selectedValue) || {id:58, name:"Fallback client" } )
+        clientStore.setClient( clientsQuery.data?.find(client=> client.name === selectedValue) || {id:58, name:"Fallback client" } )
     }
 
     const handleCancel = ()=>{
@@ -55,7 +90,8 @@ export const ClientCheckout = ()=>{
 
     const handleSearch = (value : string)=>{
 
-        console.log("Handling search "+ value)
+        // console.log("Handling search "+ value)
+        setQuery(value)
     }
 
 
@@ -84,7 +120,11 @@ export const ClientCheckout = ()=>{
         
       ];
 
-    const options:DefaultOptionType[] = clients.map(client =>( { value:client.name, label:client.name}))
+    let options:DefaultOptionType[] = []
+
+    if(!clientsQuery.isLoading && !clientsQuery.isError) options = clientsQuery.data?.map(client =>( { value:client.name, label:client.name}))
+    
+    
 
 
     return (

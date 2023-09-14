@@ -1,4 +1,6 @@
 
+
+
 import { Button, Col, Row, Space, Spin, Table, Typography, notification } from 'antd'
 import { ColumnsType } from 'antd/es/table';
 import { EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
@@ -11,26 +13,28 @@ import { QUERIES } from '../consts/query-consts';
 import axios from 'axios';
 import { API_URL } from '../consts/endpoints';
 import { ServerResponse } from '../consts/server-types';
+import { ClientType } from '../consts/operations';
+import { AddEditClient } from '../components/clients/add-edit-client';
 
 const { Title, Text } = Typography
 
 
 
 
-export const ProvidersPage =()=>{
+export const ClientsPage =()=>{
 
 
     const [open, setOpen] = useState(false);
-    const [selectedProvider, setSelectedProvider] = useState<ProviderType>()
+    const [selectedClient, setSelectedClient] = useState<ClientType>()
 
     const [api, contextHolder] = notification.useNotification()
 
     
 
-    const providerQuery = useQuery([QUERIES.providers], async()=>{
+    const clientsQuery = useQuery([QUERIES.clients], async()=>{
 
 
-      const response = await axios.get<ServerResponse<ProviderType[]>>(API_URL+"providers")
+      const response = await axios.get<ServerResponse<ClientType[]>>(API_URL+"clients")
 
  
       return response.data.data
@@ -47,13 +51,13 @@ export const ProvidersPage =()=>{
     const onClose = () => {
         
       setOpen(false);
-      setSelectedProvider(undefined)
+      setSelectedClient(undefined)
     };
 
 
     const handleEdit  = (id: number)=>{
   
-        setSelectedProvider(providerQuery.data?.find(provider => provider.id === id))
+        setSelectedClient(clientsQuery.data?.find(provider => provider.id === id))
 
         showDrawer()
     }
@@ -61,7 +65,7 @@ export const ProvidersPage =()=>{
 
 
     
-const columns: ColumnsType<ProviderType> = [
+const columns: ColumnsType<ClientType> = [
 
     
     {
@@ -144,9 +148,9 @@ const columns: ColumnsType<ProviderType> = [
 
 
 
-  if(providerQuery.isLoading) return <Spin/>
+  if(clientsQuery.isLoading) return <Spin/>
 
-  if(providerQuery.isError) return <>Something went wrong try again later</>
+  if(clientsQuery.isError) return <>Something went wrong try again later</>
 
 
 
@@ -156,7 +160,7 @@ const columns: ColumnsType<ProviderType> = [
         <Row>
             <Col span={24}>
 
-                    <Title>Providers</Title>
+                    <Title>Clients</Title>
                     <Text> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Unde laboriosam in voluptates consequatur, nam harum eligendi voluptatibus dicta distinctio officia consequuntur facilis esse maxime quas veniam, quam excepturi nemo fuga!</Text>
 
                     <Col style={{marginTop:"1em"}}>
@@ -170,8 +174,8 @@ const columns: ColumnsType<ProviderType> = [
             
         
              <Col style={{ width:"100%", marginTop:"2em"}}>
-                <AddEditProvider  open={open} onClose={onClose} providerToEdit={selectedProvider}  />
-                <Table columns={columns} dataSource={providerQuery.data}    rowKey={(record:ProviderType) => `${record.id}`} />
+                <AddEditClient  open={open} onClose={onClose} clientToEdit={selectedClient}  />
+                <Table columns={columns} dataSource={clientsQuery.data}    rowKey={(record:ClientType) => `${record.id}`} />
              </Col>   
         </Row>
 

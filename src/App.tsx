@@ -19,6 +19,7 @@ import { ProductDetailPage } from './pages/product-detail';
 import { VerifyCashierSession } from './components/operations/verify-cashier-session';
 import { Buys } from './pages/operations/buys';
 import { CashOut } from './pages/operations/cash-out';
+import { ClientsPage } from './pages/clients-page';
 
 
 function App() {
@@ -56,9 +57,11 @@ function App() {
 
                             <Route path="/providers">
                                 <Route path="" element={ <ProvidersPage />}/>
-                                
                             </Route>
 
+                            <Route path="/clients">
+                                <Route path="" element={ <ClientsPage />}/>
+                            </Route>
 
                             <Route path={"/products"}>
 

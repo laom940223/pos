@@ -80,19 +80,22 @@ export enum OperationEnum {
 
 export type ClientType ={
 
-    id: number, 
-    name: string,
-    
+    id: number,
+    name: string, 
+    address?: string
+    rfc?: string
     
 }
+
+export type CreateClient  = Omit<ClientType,"id">
 
 
 
 export const defaultClient: ClientType ={
 
     id: 1,
-    name:"General public"
-
+    name:"General public",
+    
 
 }
 

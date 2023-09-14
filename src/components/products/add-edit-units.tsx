@@ -35,8 +35,10 @@ export const AddEditUnit = ({ open, onClose, unitToEdit } :{ onClose: ()=>void, 
 
           if(e.response){
 
-              // setServerErrors(e.response.data.errors)
+              setServerErrors(e.response.data.errors)
               console.log(e.response.data)
+
+              
 
           }
         }
@@ -69,7 +71,7 @@ export const AddEditUnit = ({ open, onClose, unitToEdit } :{ onClose: ()=>void, 
 
       const onFinish = (values: any) => {
         // handleToggle()
-        console.log('Success:', values);
+        // console.log('Success:', values);
 
 
         unitMutation.mutate({...values})
@@ -78,6 +80,9 @@ export const AddEditUnit = ({ open, onClose, unitToEdit } :{ onClose: ()=>void, 
       
     const onFinishFailed = (errorInfo: any) => {
         console.log('Failed:', errorInfo);
+
+
+        // console.log(form.getFieldInstance("name"))
       };
 
 
@@ -106,7 +111,8 @@ export const AddEditUnit = ({ open, onClose, unitToEdit } :{ onClose: ()=>void, 
                   abbreviation: !unitToEdit? "": unitToEdit.abbreviation,
                   fractional:!unitToEdit ? false: unitToEdit.fractional 
                }}
-               
+              
+              
               onFinish={onFinish}
               onFinishFailed={onFinishFailed}
               autoComplete="off"
@@ -118,10 +124,9 @@ export const AddEditUnit = ({ open, onClose, unitToEdit } :{ onClose: ()=>void, 
               <Form.Item
                 name="name"
                 label="Name"
-                
-                validateStatus={`${serverErrors.find( err => err.location === "name") ? "error" :"" }`}
-                help={ `${serverErrors.find( err => err.location === "name")?.message}`}
                 rules={[{ required: true, message: 'Please enter a name' }]}
+                help={serverErrors.find(a=> a.location==="name")?.message}
+                validateStatus={ serverErrors.find(a=> a.location==="name") ? "error" : 'validating' }
               >
                 <Input placeholder="Please enter a name" />
               </Form.Item>
@@ -129,8 +134,10 @@ export const AddEditUnit = ({ open, onClose, unitToEdit } :{ onClose: ()=>void, 
             <Col span={12}>
             <Form.Item
                 name="plural"
-                label="Plural"
+                label="Plural"  
                 rules={[{ required: true ,  message: 'Please enter a plural' }]}
+                
+
               >
                 <Input  placeholder="Please enter a plural" />
               </Form.Item>

@@ -24,6 +24,8 @@ export const UnitsPage =()=>{
     const [selectedUnit, setSelectedUnit] = useState<UnitType>()
     const [api, contextHolder] = notification.useNotification()
 
+
+
     const queryClient = useQueryClient()
 
 
@@ -47,12 +49,13 @@ export const UnitsPage =()=>{
     },{
 
 
-        onError:()=>{
+        onError:(e)=>{
 
             api.error({
-               message:"Something went wrong try again later"
+               message:"Something went wrong try again later",
+               placement:"bottomLeft"
             })
-
+            
         },
 
         onSuccess:()=>{
@@ -198,7 +201,11 @@ const columns: ColumnsType<UnitType> = [
 
   return (
     <>
-
+       <Row>
+            <Col>
+                {contextHolder}
+            </Col>
+        </Row>
         <Row>
             <Col span={24}>
 
@@ -221,11 +228,7 @@ const columns: ColumnsType<UnitType> = [
              </Col>   
         </Row>
 
-        <Row>
-            <Col>
-                {contextHolder}
-            </Col>
-        </Row>
+       
     </>
   )
 

@@ -7,6 +7,7 @@ import axios, { isAxiosError } from "axios";
 import { API_URL } from "../../consts/endpoints";
 import { ServerError } from "../../consts/server-types";
 import { QUERIES } from "../../consts/query-consts";
+import { ClientType, CreateClient } from "../../consts/operations";
 
 
 const RFC_LENGTH = 8
@@ -14,10 +15,10 @@ const RFC_LENGTH = 8
 
 
 
-export const AddEditProvider = ({ open, onClose, providerToEdit: providerToEdit } :{ onClose: ()=>void, open :boolean, providerToEdit? : ProviderType } )=>{
+export const AddEditClient = ({ open, onClose, clientToEdit } :{ onClose: ()=>void, open :boolean, clientToEdit? : ClientType } )=>{
 
 
-    const [form] = Form.useForm<ProviderType>();
+    const [form] = Form.useForm<ClientType>();
     const [serverErrors, setServerErrors] = useState<ServerError[]>([])
 
     
@@ -27,17 +28,17 @@ export const AddEditProvider = ({ open, onClose, providerToEdit: providerToEdit 
       useEffect(()=>{
         form.resetFields()
         setServerErrors([])
-      }, [providerToEdit, form])
+      }, [clientToEdit, form])
 
 
 
-      const providerMutation = useMutation((provider : ProviderType | CreateProvider)=>{
+      const providerMutation = useMutation((client : ClientTypes | CreateClient)=>{
 
 
-          if(!providerToEdit) return axios.post(API_URL+"providers", provider)
+          if(!clientToEdit) return axios.post(API_URL+"clients", client)
 
 
-          return axios.put(API_URL+"providers/"+providerToEdit.id, provider)
+          return axios.put(API_URL+"clients/"+clientToEdit.id, client)
 
       }, {
 
@@ -46,6 +47,17 @@ export const AddEditProvider = ({ open, onClose, providerToEdit: providerToEdit 
 
           if(isAxiosError(error)){
 
+            
+            console.log(error.code)
+
+            if(error.code){
+
+                alert(error.code)
+                return
+            }
+
+                
+            
             if(error.response){
 
               setServerErrors(error.response?.data.errors)
@@ -61,7 +73,7 @@ export const AddEditProvider = ({ open, onClose, providerToEdit: providerToEdit 
 
         onSuccess: ()=>{
 
-            queryClient.invalidateQueries([QUERIES.providers])
+            queryClient.invalidateQueries([QUERIES.clients])
             onClose()
             form.resetFields()
         }
@@ -75,14 +87,14 @@ export const AddEditProvider = ({ open, onClose, providerToEdit: providerToEdit 
         // handleToggle()
         console.log('Success:', values);
 
-        if(!providerToEdit) {
+        if(!clientToEdit) {
 
           providerMutation.mutate(values)
         }
         else{
 
 
-          providerMutation.mutate({id: providerToEdit.id , ...values})
+          providerMutation.mutate({id: clientToEdit.id , ...values})
         }
 
 
@@ -99,7 +111,7 @@ export const AddEditProvider = ({ open, onClose, providerToEdit: providerToEdit 
     return (
 
         <Drawer
-        title= { !providerToEdit ? "Create a new provider" : "Edit provider"}
+        title= { !clientToEdit ? "Create a new provider" : "Edit provider"}
         width={720}
         onClose={onClose}
         open={open}
@@ -114,9 +126,9 @@ export const AddEditProvider = ({ open, onClose, providerToEdit: providerToEdit 
               initialValues={{ 
 
                   
-                  name: !providerToEdit ? "" : providerToEdit.name,
-                  address: !providerToEdit ? "" : providerToEdit.address,
-                  rfc: !providerToEdit? "": providerToEdit.rfc
+                  name: !clientToEdit ? "" : clientToEdit.name,
+                  address: !clientToEdit ? "" : clientToEdit.address,
+                  rfc: !clientToEdit? "": clientToEdit.rfc
 
                }}
                

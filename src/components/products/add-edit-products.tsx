@@ -1,11 +1,12 @@
-import { Button, Col, Drawer, Form, Input, Row, Select, Spin, Upload } from "antd"
-import { useEffect } from "react";
-import { CreateProduct, CreateUnit, ProductType, UnitType, sampleUnits } from "../../consts/product-types";
+import { Button, Col, Drawer, Form, Input, InputNumber, Row, Select, Spin, Upload } from "antd"
+import { useEffect, useState } from "react";
+import { CreateProduct, CreateProductPrice, CreateUnit, ProductPrice, ProductType, UnitType, sampleUnits } from "../../consts/product-types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { QUERIES } from "../../consts/query-consts";
 import axios, { isAxiosError } from "axios";
 import { API_URL } from "../../consts/endpoints";
-import { ServerResponse } from "../../consts/server-types";
+import { ServerError, ServerResponse } from "../../consts/server-types";
+import useNotification from "antd/es/notification/useNotification";
 
 
 
@@ -25,8 +26,10 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
 
 
     const [form] = Form.useForm<ProductType>();
-
     const queryClient = useQueryClient()
+
+    const [serverErrors, setServerErrors] = useState<ServerError[]>([])
+    const [api, contextHolder] = useNotification()
 
 
     const unitsQuery = useQuery([QUERIES.productunitoptions], async()=>{
@@ -39,9 +42,11 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
 
     const productMutation = useMutation((product : CreateProduct)=>{
 
-
-          return axios.post<ServerResponse<UnitType>>(API_URL+"products", product)
+        if(!productToEdit) return axios.post<ServerResponse<ProductType>>(API_URL+"products", product)
         
+        
+
+        return axios.put<ServerResponse<ProductType>>(API_URL+"products/"+productToEdit.id, product)
 
     }, {
 
@@ -49,8 +54,18 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
 
           if(isAxiosError(e)){
 
-            console.log(e.response?.data.errors)
+            if(e.response){
+
+              setServerErrors(e.response?.data.errors)
+            }
+            
           }
+
+
+          api.error({
+            message:"Something went wrong try again",
+            placement:"topLeft"
+          })
 
       },
 
@@ -59,9 +74,10 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
 
           queryClient.invalidateQueries([QUERIES.products])
           
-          form.resetFields()
+          
           onClose()
-        
+          form.resetFields()
+          setServerErrors([])
       }
 
 
@@ -73,7 +89,7 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
       useEffect(()=>{
 
         form.resetFields()
-
+        setServerErrors([])
       }, [productToEdit, form])
 
 
@@ -82,14 +98,76 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
 
       const onFinish = (values: any) => {
         // handleToggle()
-        console.log('Success:', values);
+        // console.log('Success:', values);
 
-        productMutation.mutate(values)
+          setServerErrors([])
+
+        const array :ProductPrice[] =[]
+
+       
+                const price1 = values.price1
+                const minimum1 = values.minimum1
+
+                const price2 = values.price2
+                const minimum2 = values.minimum2
+            
+                if( price2 !== 0 && minimum2 <=1){
+
+                  setServerErrors([{
+                    location:"minimum2",
+                    message:"Needs to be greater than 1"
+
+                  }])
+                  return
+                }
+
+                
+
+                
+
+              array.push({ 
+                id:  productToEdit?.prices.find(product => product.priceNumber ===1)?.id || null,
+                amount: price1, 
+                minimum: minimum1,
+                priceNumber: 1,
+              })
+
+              array.push({ 
+                id:  productToEdit?.prices.find(product => product.priceNumber ===2)?.id || null,
+                amount: price2, 
+                minimum: minimum2,
+                priceNumber: 2,
+              })
+            
+        
+    
+        // console.log(values.altBarcode)
+        
+
+        const formtedSend: CreateProduct = { 
+
+            name: values.name, 
+            barcode: values.barcode,
+            altBarcode: values.altBarcode, 
+            buyUnit: values.buyUnit,
+            saleUnit: values.saleUnit, 
+            stock:0,
+            price:values.price1,
+            prices: array
+
+        }
+
+
+        // console.log(formtedSend)
+        productMutation.mutate(formtedSend)
+
+        
         
       };
       
     const onFinishFailed = (errorInfo: any) => {
         console.log('Failed:', errorInfo);
+        setServerErrors([])
       };
 
 
@@ -109,7 +187,7 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
 
         <Drawer
         title= { !productToEdit ? "Create a new product" : "Edit product"}
-        width={720}
+        width={1000}
         onClose={onClose}
         open={open}
         bodyStyle={{ paddingBottom: 80 }}
@@ -124,11 +202,16 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
 
                   name: !productToEdit ? "" : productToEdit.name,
                   barcode: !productToEdit ? "" : productToEdit.barcode,
+                  altBarcode: !productToEdit ? "" : productToEdit.altBarcode,
+                  price1: !productToEdit? 1 : productToEdit.prices[0].amount,
+                  price2: !productToEdit? 0 : productToEdit.prices[1]?.amount || 0,
+
+                  minimum1: !productToEdit? 1 : productToEdit.prices[0].minimum,
+                  minimum2: !productToEdit? 0 : productToEdit.prices[1]?.minimum,
+                  //   image:  !productToEdit ? "" : productToEdit.image,
                   
-                //   image:  !productToEdit ? "" : productToEdit.image,
-                  description: !productToEdit ? "" : productToEdit.description,
-                  buyUnit: !productToEdit ? "" : productToEdit.buyUnit.name,
-                  saleUnit: !productToEdit ? "" : productToEdit.saleUnit.name
+                  buyUnit: !productToEdit ? "" : productToEdit.buyUnit.id,
+                  saleUnit: !productToEdit ? "" : productToEdit.saleUnit.id
 
                }}
                
@@ -138,22 +221,43 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
         
         >
           
-          <Row gutter={16}>
-            <Col span={12}>
+          <Row>
+            <Col span={24}>
               <Form.Item
-                name="name"
-                label="Name"
-                
-                rules={[{ required: true, message: 'Please enter name' }]}
-              >
-                <Input placeholder="Please enter a name" />
-              </Form.Item>
+                  name="name"
+                  label="Name"
+                  rules={[{ required: true, message: 'Please enter name' }]}
+                  validateStatus={serverErrors.find(e=> e.location === "name") ?"error": ""  }
+                  help={serverErrors.find(e=> e.location === "name")?.message}
+                >
+                  <Input placeholder="Please enter a name" />
+                </Form.Item>
             </Col>
+          </Row>
+
+
+          <Row gutter={16}>
             <Col span={12}>
             <Form.Item
                 name="barcode"
                 label="Barcode"
+                rules={[{ required: true, message: 'Please enter a valid code' }]}
+                validateStatus={serverErrors.find(e=> e.location === "barcode") ?"error": ""  }
+                help={serverErrors.find(e=> e.location === "barcode")?.message}
+              >
+                <Input  placeholder="Please enter a code" />
+              </Form.Item>
+            </Col>
+
+
+            <Col span={12}>
+            <Form.Item
+                name="altBarcode"
+                label="Barcode"
+                initialValue={""}
                 rules={[{ message: 'Please enter a valid code' }]}
+                validateStatus={serverErrors.find(e=> e.location === "altBarcode") ?"error": ""  }
+                help={serverErrors.find(e=> e.location === "altBarcode")?.message}
               >
                 <Input  placeholder="Please enter a code" />
               </Form.Item>
@@ -203,15 +307,52 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
 
 
           <Row gutter={16}>
-            <Col span={24}>
+            <Col span={12}>
             <Form.Item
-                name="description"
-                label="Description"
-                rules={[{ message: 'Please enter a valid description' }]}
+                name="price1"
+                label="Price 1"
+                rules={[{ required:true, message: 'Please enter a price' }]}
+                // validateStatus={serverErrors.find(e=> e.location === "price1") ?"error": ""  }
+                // help={serverErrors.find(e=> e.location === "price1")?.message}
               >
-                <Input.TextArea  placeholder="Please enter a description" />
+                <InputNumber style={{width:"100%"}} min={0} precision={2}  placeholder="Please enter a price" />
+              </Form.Item>
+
+              <Form.Item
+                name="minimum1"
+                label="Minimum"
+                initialValue={1}
+                rules={[{ required:true, message: 'Please enter an amount' }]}
+                // validateStatus={serverErrors.find(e=> e.location === "barcode") ?"error": ""  }
+                // help={serverErrors.find(e=> e.location === "barcode")?.message}
+              >
+                <InputNumber disabled  style={{width:"100%"}} min={0} precision={2}  placeholder="Please enter an amount" />
               </Form.Item>
             </Col>
+
+            <Col span={12}>
+              <Form.Item
+                  name="price2"
+                  label="Price 2"
+                  initialValue={0}
+                  rules={[{ required: false, message: 'Please enter a price' }]}
+                >
+                  <InputNumber style={{width:"100%"}} min={0} precision={2}  placeholder="Please enter a price" />
+                </Form.Item>
+
+                <Form.Item
+                  name="minimum2"
+                  label="Minimum"
+                  initialValue={0}
+                  rules={[{ required: false, message: 'Please enter a minimum amount' }]}
+                  validateStatus={serverErrors.find(e=> e.location === "minimum2") ?"error": ""  }
+                  help={serverErrors.find(e=> e.location === "minimum2")?.message}
+
+                >
+                  <InputNumber  style={{width:"100%"}} min={0} precision={2}  placeholder="Please enter a description" />
+                </Form.Item>
+              </Col>
+
           </Row>
          
         
@@ -226,6 +367,8 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
               <Button htmlType="submit" type="primary">
                   Create
                 </Button>
+
+                {contextHolder}
             </Col>
           </Row>
 
@@ -235,3 +378,5 @@ export const AddEditProduct = ({ open, onClose, productToEdit } :{ onClose: ()=>
     )
 
 }
+
+

@@ -2,13 +2,12 @@
 
 
 
-import { Button, Col, Popconfirm, Row, Space, Spin, Table, Tag, Typography, notification } from 'antd'
+import { Button, Col, Row, Space, Spin, Table, Typography, notification } from 'antd'
 import { ColumnsType } from 'antd/es/table';
-import { UserRoles, UsersType } from '../consts/users';
-import { DeleteOutlined, DownloadOutlined, EditOutlined, MoreOutlined, PlusCircleOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+
+import { EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useState, useCallback } from 'react';
-import { AddEditUser } from '../components/users/add-edit-user';
 import { ProductType, sampleProducts } from '../consts/product-types';
 import { AddEditProduct } from '../components/products/add-edit-products';
 import { useQuery } from '@tanstack/react-query';
@@ -34,12 +33,8 @@ export const ProductsPage =()=>{
 
 
     const productsQuery = useQuery([QUERIES.products], async ()=>{
-
-
           const response = await axios.get<ServerResponse<ProductType[]>>(API_URL+"products")
-
           return response.data
-
     })
 
 
@@ -87,14 +82,8 @@ export const ProductsPage =()=>{
 
     const handleEdit  = (id: number)=>{
 
-        
-        
-        
-        setSelectedProduct(sampleProducts.find(product => product.id ===id))
-
+        setSelectedProduct(productsQuery.data?.data.find(product => product.id ===id))
         showDrawer()
-
-
     }
 
 
@@ -113,8 +102,6 @@ const columns: ColumnsType<ProductType> = [
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-
-      
       sorter: (a,b)=>{
         
         if (a.name < b.name) {
@@ -130,13 +117,15 @@ const columns: ColumnsType<ProductType> = [
       
     },
 
-    // {
+    {
 
-    //     title:"Price",
-    //     dataIndex:"price",
-    //     key:"price",
+        title:"Price",
+        key:"price",
+        render: (_, record)=>{
+          return record.prices[0].amount
+        }
 
-    //   },
+      },
 
     {
       title: 'Stock',
@@ -172,7 +161,7 @@ const columns: ColumnsType<ProductType> = [
                 <Button type="link" icon={<PlusCircleOutlined />} size={"small"} />
             </Link>
 
-            {/* <Button type="link" onClick={()=>{ handleEdit(record.id) }} icon={<EditOutlined />}/> */}
+            <Button type="link" onClick={()=>{ handleEdit(record.id) }} icon={<EditOutlined />}/>
 
             {/* <Popconfirm
                 title="Delete the task"
@@ -218,7 +207,7 @@ const columns: ColumnsType<ProductType> = [
             
         
              <Col style={{ width:"100%", marginTop:"2em"}}>
-                <AddEditProduct  open={open} onClose={onClose}  />
+                <AddEditProduct  open={open} onClose={onClose} productToEdit={selectedProduct} />
                 <Table columns={columns} dataSource={productsQuery.data.data}    rowKey={(record:ProductType) => `${record.id}`} />
              </Col>   
         </Row>

@@ -15,8 +15,12 @@ export const  QUERIES = {
     registerSession: "register-session",
     sessionOperations :"session-operations",
 
+    clients: "clients",
+
 
     users:"users",
+
+    SEARCH_CLIENTS_BY_NAME: "SEARCH_CLIENTS_BY_NAME",
 
     SEARCH_PRODUCTS_BY_NAME: "SEARCH_PRODUCTS_NAME",
     SEARCH_PRODUCTS_BY_BARCODE: "SEARCH_PRODUCTS_BY_BARCODE"

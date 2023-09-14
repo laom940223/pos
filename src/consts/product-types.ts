@@ -3,19 +3,29 @@
 export type ProductType = {
 
     id: number,
-    barcode?: string,
+    barcode: string,
+    altBarcode?: string
     name: string, 
-    description?: string,
     image?: string,
     price: number,
-    // brand? : string,
+    prices: ProductPrice[]
     stock: number,
     saleUnit: UnitType 
     buyUnit: UnitType
-    
-    
 } 
 
+
+export type ProductPrice = {
+
+    id: number | null, 
+    productId?: number,
+    priceNumber: number,
+    amount: number,
+    minimum: number
+}
+
+
+export type CreateProductPrice = Omit<ProductPrice, "id" >
 
 export type CreateProduct = Omit<ProductType, "id">
 
@@ -74,7 +84,17 @@ export const sampleUnits : UnitType[] = [
 
 ]
 
+const samplePrice : ProductPrice[] = [
 
+
+    {
+        id:1,
+        amount:25.36,
+        minimum:1,
+        priceNumber:1,
+        productId:24
+    }
+]
 
 
 export const sampleProducts:ProductType[]  = [
@@ -84,8 +104,9 @@ export const sampleProducts:ProductType[]  = [
 
         id:12,
         name:"Coca Cola",
-        description:"short description",
+        barcode:"123456",
         price:25.35,
+        prices: [...samplePrice],
         stock:0,
         saleUnit:sampleUnits[1],
         image:"https://fastly.picsum.photos/id/294/200/300.jpg?hmac=37ZMLugCxZOqrLbLvaJ_09fT_uPfl3zlMkICmkVxobg",
@@ -98,8 +119,9 @@ export const sampleProducts:ProductType[]  = [
 
         id:1,
         name:"Tomate",
-        description:"short description",
+        barcode:"2536",
         price:25.69,
+        prices: [...samplePrice],
         stock:0,
         saleUnit:sampleUnits[0],
         image:"https://fastly.picsum.photos/id/294/200/300.jpg?hmac=37ZMLugCxZOqrLbLvaJ_09fT_uPfl3zlMkICmkVxobg",
@@ -111,8 +133,9 @@ export const sampleProducts:ProductType[]  = [
     {
         id:2425,
         name:"Platano",
-        description:"description",
+        barcode:"8969",
         price:15,
+        prices: [...samplePrice],
         stock:0,
         saleUnit:sampleUnits[0],
         image:"https://fastly.picsum.photos/id/294/200/300.jpg?hmac=37ZMLugCxZOqrLbLvaJ_09fT_uPfl3zlMkICmkVxobg",
@@ -123,16 +146,21 @@ export const sampleProducts:ProductType[]  = [
     {
         id:123,
         name:"Azucar",
-        description:"Costal de azucar",
+        barcode:"1234",
         price:15.89,
+        prices: [...samplePrice],
         stock:0,
         buyUnit:sampleUnits[3],
         saleUnit:sampleUnits[0],
-        barcode:"asdasde25"
+        
     }
     
 
 
 
 ] 
+
+
+
+
 

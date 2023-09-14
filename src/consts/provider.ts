@@ -7,6 +7,8 @@ export type ProviderType ={
 
 }
 
+export type  CreateProvider = Omit<ProviderType, "id">
+
 
 export const sampleProviders: ProviderType[] = [
 
