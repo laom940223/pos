@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import { ClientType, ProductOperationDetail } from '../consts/operations'
+import { ClientType, ProductOperationDetail, Register } from '../consts/operations'
 import { produce } from 'immer'
 import { ProviderType } from '../consts/provider'
 
@@ -50,11 +50,16 @@ export interface  OperationState {
         provider?: ProviderType,
         setProvider:( provider: ProviderType) => void
         
+    },
+
+
+    registerStore:{
+
+        register?: Register,
+        setRegister:( register: Register)=>void,
+        
 
     }
-
-
-
 
 }
 
@@ -80,7 +85,7 @@ export const useOperationStore = create<OperationState>((set) => ({
             const index = state.saleStore.products.findIndex( fproduct => fproduct.product?.id === product.product?.id)
 
             if( index < 0 ){
-                state.saleStore.products =  state.saleStore.products.concat(product)
+                state.saleStore.products =  state.saleStore.products.concat({...product, price: product.product?.prices[0].amount})
                 return
             }
             state.saleStore.products[index]=  {...state.saleStore.products[index], quantity: product.quantity! + state.saleStore.products[index].quantity!}
@@ -93,9 +98,19 @@ export const useOperationStore = create<OperationState>((set) => ({
 
             if(index< 0) return
 
-            const result = state.saleStore.products[index].quantity! + amount
+            let result = state.saleStore.products[index].quantity! + amount
 
-            state.saleStore.products[index] = {...state.saleStore.products[index], quantity: result> 0 ? result : 1   }
+            result =result> 0 ? result : 1
+
+            let price =state.saleStore.products[index].product!.prices[0].amount
+
+            if(state.saleStore.products[index].product!.prices[1].amount >0 && result>= state.saleStore.products[index].product!.prices[1].minimum){
+
+                price = state.saleStore.products[index].product!.prices[1].amount
+            }
+
+
+            state.saleStore.products[index] = {...state.saleStore.products[index], quantity: result, price: price   }
 
         })),
 
@@ -154,9 +169,20 @@ export const useOperationStore = create<OperationState>((set) => ({
     providerStore:{
         provider: undefined,
         setProvider: (provider)=>set(produce<OperationState>((state)=>{ state.providerStore.provider= provider  })),
+    }, 
+
+    
+
+    registerStore:{
+
+
+        register:undefined,
+
+        setRegister: (register)=> set(produce<OperationState>((state)=>{ state.registerStore.register=register}))
     }
 
     
+
 
         
 

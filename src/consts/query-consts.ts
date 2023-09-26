@@ -13,10 +13,12 @@ export const  QUERIES = {
     singleProduct: "single-product",
 
     registerSession: "register-session",
+    lastSession:"last-session",
     sessionOperations :"session-operations",
 
     clients: "clients",
 
+    registers:"registers",
 
     users:"users",
 

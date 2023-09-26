@@ -97,6 +97,11 @@ const columns: ColumnsType<ProductType> = [
       dataIndex: 'id',
       key: 'id',
     },
+    {
+      title: 'Barcode',
+      dataIndex: 'barcode',
+      key: 'barcode',
+    },
 
     {
       title: 'Name',

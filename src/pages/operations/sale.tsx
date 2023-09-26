@@ -5,12 +5,15 @@ import { ClientCheckout } from "../../components/checkout/client-checkout";
 import {  useOperationStore } from "../../slices/operation-store";
 import {  ProductType, sampleProducts } from "../../consts/product-types";
 import { ColumnsType } from "antd/es/table";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERIES } from "../../consts/query-consts";
 
 import { OperationEnum, OperationType, ProductOperationDetail, RegisterSession } from "../../consts/operations";
 
 import { SearchProduct } from "../../components/operations/search-products";
+import { API_URL } from "../../consts/endpoints";
+import axios from "axios";
+import { ServerResponse } from "../../consts/server-types";
 
 
 
@@ -42,12 +45,29 @@ export const Sale = ()=>{
     
     const queryClient = useQueryClient()
 
-    const registerSession = queryClient.getQueryData<RegisterSession>([QUERIES.registerSession])
-    
-    let total = 0
-    productsStore.products.forEach((acc)=>{ total = total + (acc.product!.price * acc.quantity!) })
+    const lastSessions = queryClient.getQueryData<RegisterSession[]>([QUERIES.lastSession])
+    const registerSession = lastSessions ? lastSessions[0]: null
 
-   
+    let total = 0
+    productsStore.products.forEach((acc)=>{ total = total + (acc.price * acc.quantity!) })
+
+
+    
+    const searchByBarcode = useMutation(async (query: string)=>{
+
+            const response = await axios.post<ServerResponse<ProductType>>(API_URL+"products/barcode",{ query})
+            return response.data.data
+    },
+    
+        {
+            onError:()=>{
+
+                console.log("There was an error")
+                setSearchProduct("")
+            }
+        }
+
+    )
 
 
     const handleSearchResourceOpen = useCallback(()=>{
@@ -107,9 +127,6 @@ export const Sale = ()=>{
     },[cash, total, registerSession?.id, client, productsStore])
 
 
-
-
-
     const handleFractionalCancel = useCallback(()=>{
         setIsDecimalOpen(false)
     },[])
@@ -162,13 +179,20 @@ export const Sale = ()=>{
       )
     
 
-      const onSearchProduct = (value: string) =>{
+      const onSearchProduct = async(value: string) =>{
 
         
-        //Todo make an api call to search for product 
-        if(value==="") return         
-        const selectedProduct = sampleProducts.find(searchable => searchable.id === +value)
         
+        if(value==="") return       
+        
+        const selectedProduct= await searchByBarcode.mutateAsync(value)
+
+
+        // console.log(product)
+        // const selectedProduct = sampleProducts.find(searchable => searchable.id === +value)
+        
+
+
         if(!selectedProduct){
             setSearchProduct("")
             return
@@ -232,14 +256,14 @@ export const Sale = ()=>{
         {
             title: 'Price',
             key: 'price',
-            render: (_, record)=> record.product!.price
+            render: (_, record)=> record.price
         },
 
 
         {
             title: 'Sub Total',
             key: 'price',
-            render: (_, record)=>`$${ (record.product!.price * record.quantity!).toFixed(2) }`
+            render: (_, record)=>`$${ (record.price! * record.quantity!).toFixed(2) }`
         },
  
         {
@@ -265,26 +289,26 @@ export const Sale = ()=>{
 
 
 
-    
+    const openAt = new Date(registerSession.openAt)
     
 
     return (
         <>
 
-        <Row>
+         <Row>
             <Col span={24} style={{ display:"flex", justifyContent:"flex-end"}}>
-                    <Title level={4}> {registerSession.register.name} </Title>
+                     <Title level={4}> {registerSession.register.name} </Title> 
                     
             </Col>
 
             <Col span={24} style={{display:"flex", justifyContent:"flex-end"}}>
-                <Text>Opened at: {` ${registerSession.openTime.toLocaleDateString()} ${registerSession.openTime.toLocaleTimeString()}`}</Text>
+                <Text>Opened at: {` ${openAt.toLocaleDateString()} ${openAt.toLocaleTimeString()}`}</Text>
             </Col>
 
             <Col span={24} style={{display:"flex", justifyContent:"flex-end"}}>
                 <Text>Operated By: {`${registerSession.user?.name} ${registerSession.user?.lastname}`}</Text>
-            </Col>
-        </Row>
+            </Col> 
+        </Row> 
 
 
         <Row>

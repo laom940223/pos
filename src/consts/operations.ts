@@ -9,16 +9,23 @@ export type RegisterSession = {
     id?: number, 
     user?: UsersType, 
     userId?: number
-    openTime: Date,
-    closingTime?: Date
-    moneyAtOpen: number
-    moneyAtClose?: number
-    authorizedOpenBy?: UsersType | number
-    authorizedCloseBy?: UsersType | number
+    openAt: Date,
+    closedAt?: Date
+    openingAmount: number
+    closingAmount?: number
+    openAuthorizedBy?: UsersType | number
+    closeAuthorizedBy?: UsersType | number
     register: Register
     createdAt : Date
 
  }
+
+
+
+
+ 
+
+
 
 
 
@@ -58,7 +65,7 @@ export type ProductOperationDetail = {
 
     salePrice1?: number,
     salePrice2?: number,
-    salePrice3?: number,
+    
     
 
 }
@@ -125,9 +132,9 @@ export const sampleregisterSession: RegisterSession[] = [
     {
         id:1,
         user:sampleUsers[0],
-        openTime: dayjs(new Date()).subtract(3,'hours').toDate(),
+        openAt: dayjs(new Date()).subtract(3,'hours').toDate(),
         createdAt: dayjs(new Date()).subtract(4,'hours').toDate(),
-        moneyAtOpen:589,
+        openingAmount:589,
         register: registers[0]
 
     }

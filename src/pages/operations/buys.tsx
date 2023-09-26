@@ -39,8 +39,12 @@ export const Buys = ()=>{
     const { buyStore, provider }  = useOperationStore((state)=>({ buyStore : state.buyStore, provider: state.providerStore.provider}))
     
     const queryClient = useQueryClient()
-    const registerSession = queryClient.getQueryData<RegisterSession>([QUERIES.registerSession])
+    const lastSessions = queryClient.getQueryData<RegisterSession[]>([QUERIES.lastSession])
+    
+    const registerSession = lastSessions ? lastSessions[0]: null
 
+
+    console.log(lastSessions)
     let total = 0
     buyStore.products.forEach((acc)=>{ total = total + (acc.price! * acc.quantity!) })
 
@@ -256,7 +260,7 @@ export const Buys = ()=>{
     if(!registerSession) return "Something went wrong"
 
 
-
+    const openAt = new Date(registerSession.openAt)
     
     
     return (
@@ -272,7 +276,7 @@ export const Buys = ()=>{
             </Col>
 
             <Col span={24} style={{display:"flex", justifyContent:"flex-end"}}>
-                <Text>Opened at: {` ${registerSession.openTime.toLocaleDateString()} ${registerSession.openTime.toLocaleTimeString()}`}</Text>
+            <Text>Opened at: {` ${openAt.toLocaleDateString()} ${openAt.toLocaleTimeString()}`}</Text>
             </Col>
 
             <Col span={24} style={{display:"flex", justifyContent:"flex-end"}}>

@@ -1,7 +1,10 @@
 import { useQuery } from "@tanstack/react-query"
 import { QUERIES } from "../../consts/query-consts"
-import { UsersType, sampleUsers } from "../../consts/users"
+import { UsersType } from "../../consts/users"
 import { Outlet } from "react-router-dom"
+import axios from "axios"
+import { API_URL } from "../../consts/endpoints"
+import { ServerResponse } from "../../consts/server-types"
 
 
 export const AuthData = ()=>{
@@ -9,21 +12,11 @@ export const AuthData = ()=>{
 
     
     
-  const auth = useQuery([ QUERIES.auth ],()=>{
+  const auth = useQuery([ QUERIES.auth ],async()=>{
     
-    return new Promise<UsersType | null>((resolve, reject) =>{
-
-        const timeout= setTimeout( ()=>{
-
-            // console.log("Rejecting")
-            // reject("Cause i want")
-            resolve(sampleUsers[0])
-            clearTimeout(timeout)
-        } ,1000)
-
-
-        // return ()=>{  clearTimeout(timeout)}
-    })
+    
+    const response= await axios.get<ServerResponse<UsersType[]>>(API_URL+"users")
+    return response.data.data[1]
 
 })
 

@@ -5,6 +5,9 @@ import { useQuery } from "@tanstack/react-query"
 import { QUERIES } from "../../consts/query-consts"
 import { ProductType, sampleProducts } from "../../consts/product-types"
 import { DefaultOptionType } from "antd/es/select"
+import axios from "axios"
+import { ServerResponse } from "../../consts/server-types"
+import { API_URL } from "../../consts/endpoints"
 
 
 export interface SearchProductProps {
@@ -26,15 +29,12 @@ export const SearchProduct = ({ onCancel, onSelect, open } : SearchProductProps 
     
     
 
-    const options = useQuery<ProductType[] | null>([QUERIES.SEARCH_PRODUCTS_BY_NAME], ()=>{
-        return new Promise<ProductType[] | null>((resolve)=>{
+    const options = useQuery<ProductType[] | null>([QUERIES.SEARCH_PRODUCTS_BY_NAME], async ()=>{
+        
 
-                const time = setTimeout(()=>{
+        const response = await axios.post<ServerResponse<ProductType[]>>(API_URL+"products/search",{query: debounceValue})
+        return response.data.data
 
-                        resolve(sampleProducts)
-                        clearTimeout(time)
-                }, 1000)
-            })
     } , {enabled:false})
 
 

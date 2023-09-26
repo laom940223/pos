@@ -20,13 +20,15 @@ import { VerifyCashierSession } from './components/operations/verify-cashier-ses
 import { Buys } from './pages/operations/buys';
 import { CashOut } from './pages/operations/cash-out';
 import { ClientsPage } from './pages/clients-page';
+import { RegistersPage } from './pages/registers';
+import { useLoadRegister } from './hooks/use-load-register';
 
 
 function App() {
 
 
   
-
+    useLoadRegister()
 
 
 
@@ -38,6 +40,22 @@ function App() {
               <Route path="" element={<PrivateRoute />}>
                   <Route path="" element={<AppLayout/>}>
                         
+
+
+                    <Route path='/operations' element={<VerifyCashierSession/>}>
+                        <Route path='/operations/sales' element={ <Sale/> }/>
+                        <Route path='/operations/buy' element={<Buys/> } />
+                        <Route path="/operations/cash-out" element={<CashOut/>}></Route>
+                    </Route>
+
+                    <Route path={"/products"}>
+
+                        <Route path={""} element={<ProductsPage/>}/>
+                        <Route path={"/products/:productId"}  element ={ <ProductDetailPage/> }/>
+                        <Route path='/products/units' element={<UnitsPage/>} />
+
+                    </Route>
+
                       <Route path='' element={
                           <AuthorizationRoute roles={[UserRoles.ADMIN]}/>
                         }>
@@ -48,12 +66,7 @@ function App() {
                             </Route>
 
 
-                            <Route path='/operations' element={<VerifyCashierSession/>}>
-                                    
-                                    <Route path='/operations/sales' element={ <Sale/> }/>
-                                    <Route path='/operations/buy' element={<Buys/> } />
-                                    <Route path="/operations/cash-out" element={<CashOut/>}></Route>
-                            </Route>
+                           
 
                             <Route path="/providers">
                                 <Route path="" element={ <ProvidersPage />}/>
@@ -63,13 +76,11 @@ function App() {
                                 <Route path="" element={ <ClientsPage />}/>
                             </Route>
 
-                            <Route path={"/products"}>
-
-                                <Route path={""} element={<ProductsPage/>}/>
-                                <Route path={"/products/:productId"}  element ={ <ProductDetailPage/> }/>
-                                <Route path='/products/units' element={<UnitsPage/>} />
-
+                            <Route path="/registers">
+                                <Route path="" element={ <RegistersPage />}/>
                             </Route>
+
+                            
                         </Route>
 
 

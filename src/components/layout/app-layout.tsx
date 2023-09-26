@@ -117,6 +117,12 @@ export const AppLayout = ()=>{
                             key:"5",
                             icon: <VerticalAlignBottomOutlined />,
                             label:<Link to ="/clients" >Clients</Link>
+                        },
+
+                        {
+                            key:"6",
+                            icon: <VerticalAlignBottomOutlined />,
+                            label:<Link to ="/registers" >Register</Link>
                         }
 
                         ]}

@@ -57,7 +57,7 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
             form.setFieldValue("quantity", buysStore.products[index].quantity)
             form.setFieldValue("factor", buysStore.products[index].factor)
             form.setFieldValue("price", buysStore.products[index].price)
-            form.setFieldValue("salePrice1", buysStore.products[index].salePrice1)
+            form.setFieldValue("salePrice1", buysStore.products[index].product?.prices[0].amount)
         }
 
         if(product && index<0 ){ 
@@ -67,7 +67,7 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
         }
 
 
-    },[product])
+    },[buysStore.products, form, index, product])
 
 
    
