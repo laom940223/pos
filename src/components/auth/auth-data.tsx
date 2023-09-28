@@ -16,7 +16,9 @@ export const AuthData = ()=>{
     
     
     const response= await axios.get<ServerResponse<UsersType[]>>(API_URL+"users")
-    return response.data.data[1]
+
+    // console.log(response.data.data)
+    return response.data.data[2]
 
 })
 

@@ -2,7 +2,7 @@ import { Avatar, Button, Col, Dropdown, Layout, Menu, MenuProps, Row, Space, the
 import Sider from "antd/es/layout/Sider"
 import { Content, Header } from "antd/es/layout/layout"
 import { Link, Outlet } from "react-router-dom"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 import {
   DollarOutlined,
@@ -16,6 +16,7 @@ import {
   } from '@ant-design/icons';
 import { useQueryClient } from "@tanstack/react-query"
 import { QUERIES } from "../../consts/query-consts"
+import { UsersType } from "../../consts/users"
 
 export const AppLayout = ()=>{
 
@@ -23,6 +24,10 @@ export const AppLayout = ()=>{
 
     const queryClient = useQueryClient()
 
+    const user = queryClient.getQueryData<UsersType>([QUERIES.auth])
+
+
+    
     
 
     const [collapsed, setCollapsed] = useState(false)
@@ -45,9 +50,16 @@ export const AppLayout = ()=>{
       const items: MenuProps['items'] = [
         
         {
+
+            label: <>{`Hello ${user?.username ? user.username : "Unknown"}`}</>,
+             key:1
+
+        },
+
+        {
           
           label: <Button type="link" onClick={handleLogOut}>Log Out </Button>,
-          key: '1',
+          key: '2',
         },
       ];
 

@@ -2,7 +2,7 @@ import {  Descriptions, DescriptionsProps, Typography } from "antd"
 
 import { useQueryClient } from "@tanstack/react-query"
 import { QUERIES } from "../../consts/query-consts"
-import { RegisterSession, sampleOpeations } from "../../consts/operations"
+import { RegisterSession } from "../../consts/operations"
 
 
 
@@ -12,7 +12,7 @@ export const CashOut =()=>{
 
         const queryClient= useQueryClient()
         const session = queryClient.getQueryData<RegisterSession | null>([QUERIES.registerSession])
-        const calculatedTotal = sampleOpeations.map((value)=>{ return value.type ==="SALE" ?  value.amount : -value.amount  }).reduce((acc, curr)=> acc + curr)
+        // const calculatedTotal = sampleOpeations.map((value)=>{ return value.type ==="SALE" ?  value.amount : -value.amount  }).reduce((acc, curr)=> acc + curr)
 
 
 
@@ -28,12 +28,8 @@ export const CashOut =()=>{
               children: <p>{session?.user?.username}</p>,
             },
 
-            {
-                key:"3",
-                label:"Opened At:",
-                children: <p>{session?.openTime.toLocaleString()}</p>,
-
-            }
+           
+           
 
           ]
           
@@ -49,7 +45,7 @@ export const CashOut =()=>{
                 <Descriptions title="User Info" items={items} />;
 
                 <>
-                    <Typography.Text> Total counter {calculatedTotal}</Typography.Text>
+                    {/* <Typography.Text> Total counter {calculatedTotal}</Typography.Text> */}
                 </>
 
                 <Typography.Text> TO DO input with money and authorization from admin</Typography.Text>

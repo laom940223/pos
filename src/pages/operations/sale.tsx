@@ -8,12 +8,14 @@ import { ColumnsType } from "antd/es/table";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERIES } from "../../consts/query-consts";
 
-import { OperationEnum, OperationType, ProductOperationDetail, RegisterSession } from "../../consts/operations";
+import { OperationEnum, Operation, ProductOperationDetail, RegisterSession } from "../../consts/operations";
 
 import { SearchProduct } from "../../components/operations/search-products";
 import { API_URL } from "../../consts/endpoints";
 import axios from "axios";
 import { ServerResponse } from "../../consts/server-types";
+import { PaymentModal } from "../../components/checkout/payment-modal";
+import { SaleSuccessModal } from "../../components/operations/sale-success";
 
 
 
@@ -32,7 +34,8 @@ export const Sale = ()=>{
     
 
     
-    const [cash, setCash] = useState(0)
+    const [change, setChange] = useState(0)
+    const [successOpen, setSuccessOpen] = useState(false)
     const [searchProduct, setSearchProduct] = useState("")  
     const [isSearchResourceOpen, setIsSearchResourceOpen]= useState(false)
     const [isPaymentOpen, setIsPaymentOpen] = useState(false)
@@ -49,7 +52,7 @@ export const Sale = ()=>{
     const registerSession = lastSessions ? lastSessions[0]: null
 
     let total = 0
-    productsStore.products.forEach((acc)=>{ total = total + (acc.price * acc.quantity!) })
+    productsStore.products.forEach((acc)=>{ total = total + (acc.price! * acc.quantity!) })
 
 
     
@@ -83,7 +86,7 @@ export const Sale = ()=>{
 
 
         if(!product.saleUnit.fractional){
-            productsStore.addProduct({ product, quantity :1, type:OperationEnum.SALE })
+            productsStore.addProduct({ product, quantity: 1 , productId: product.id })
         setSearchProduct("")
         // setChangeProduct((prev)=>!prev )
         setIsSearchResourceOpen(false)
@@ -105,26 +108,14 @@ export const Sale = ()=>{
         setIsPaymentOpen(false)
     },[])
 
-    const handlePaymentOk = useCallback ( ()=>{
-        const change = cash -total 
-
-        if(change < 0) return
-
-            console.log({
-
-                id:1,
-                sessionId: registerSession?.id,
-                type:OperationEnum.SALE.toLocaleString(),
-                amount: +total.toFixed(2),
-                provider: client,
-                products: productsStore.products
-
-            } as OperationType)
+    const handlePaymentOk = useCallback ( (change: number)=>{
+       
         productsStore.clearProducts()
-        setCash(0)
+        setChange(change)
         setIsPaymentOpen(false)
+        setSuccessOpen(true)
         
-    },[cash, total, registerSession?.id, client, productsStore])
+    },[productsStore])
 
 
     const handleFractionalCancel = useCallback(()=>{
@@ -134,17 +125,22 @@ export const Sale = ()=>{
     
     const handleFractionalOk = useCallback ( ()=>{
 
-        productsStore.addProduct({product: {...decimalProduct.current! }, quantity: productQuantity || 0})
+        productsStore.addProduct({product: {...decimalProduct.current! }, productId: decimalProduct.current?.id || 0,  quantity: productQuantity || 0})
         setIsDecimalOpen(false)
+        decimalProduct.current = undefined;
+
         setProductQuantity(0)
         
     },[productQuantity, productsStore])
 
 
-    
-    const handleCashChange = useCallback((e: number | null)=>{
-        setCash(e? e : 0)
-    }, [])
+    const  handleSuccessOk = useCallback(()=>{
+
+        setSuccessOpen(false)
+        setChange(0)
+
+    },[])
+   
 
 
     const handleProductQuantityChange = useCallback(
@@ -385,45 +381,8 @@ export const Sale = ()=>{
                         Pay
                     </Button>
 
-                    <Modal title="Payment" open={isPaymentOpen} 
-                        onOk={handlePaymentOk} 
-                        onCancel={handlePaymentCancel}
-                        footer={[
-                            <Button key="back" onClick={handlePaymentCancel}>
-                        Cancel
-                      </Button>,
-                      <Button key="submit" type="primary" disabled={total>cash} onClick={handlePaymentOk}>
-                        Pay
-                      </Button>,]}
-                        >
-                        <Row style={{width:"100%", marginTop:"1em"}}>
-                            <Col span={24}>
-                                <Text style={{ fontSize:"1.5em", textAlign:"center" }} >{`Total: ${total.toFixed(2)} MXN`}</Text>
-                            </Col>
-                        </Row>
-
-                        <Row style={{marginTop:"1em", marginBottom:"1em"}} >
-                            <Col span={24} >
-                                    <InputNumber 
-                                        value={cash}
-                                        status={`${total > cash? "error" : ""}`}
-                                        onChange={handleCashChange}
-                                        onPressEnter={handlePaymentOk}
-                                        name="cash" 
-                                        style={{width:"100%"   }} size="middle" 
-                                        placeholder="Insert quantity"
-
-                                        />
-                            </Col>
-                        </Row>
-
-                        <Row style={{marginTop:"1em", marginBottom:"1em"}} >
-                            <Col span={24} >
-                                  <Text style={{ fontSize:"1.5em", textAlign:"center" }}>Change: {`${(cash - total).toFixed(2) }`}</Text>
-                            </Col>
-                        </Row>
-                        
-                    </Modal>
+                    <PaymentModal  open={isPaymentOpen} onCancel={handlePaymentCancel} onOk={ handlePaymentOk}/>
+                    <SaleSuccessModal open={successOpen} change={change}  onCancel={handleSuccessOk} onOk={handleSuccessOk} />
 
             </Col>
         </Row>

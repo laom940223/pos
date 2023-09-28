@@ -85,7 +85,7 @@ export const useOperationStore = create<OperationState>((set) => ({
             const index = state.saleStore.products.findIndex( fproduct => fproduct.product?.id === product.product?.id)
 
             if( index < 0 ){
-                state.saleStore.products =  state.saleStore.products.concat({...product, price: product.product?.prices[0].amount})
+                state.saleStore.products =  state.saleStore.products.concat({...product, productId: product.product?.id! , price: product.product?.prices[0].amount})
                 return
             }
             state.saleStore.products[index]=  {...state.saleStore.products[index], quantity: product.quantity! + state.saleStore.products[index].quantity!}

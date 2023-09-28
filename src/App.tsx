@@ -57,7 +57,7 @@ function App() {
                     </Route>
 
                       <Route path='' element={
-                          <AuthorizationRoute roles={[UserRoles.ADMIN]}/>
+                          <AuthorizationRoute roles={[UserRoles.ADMIN, UserRoles.SUPERVISOR]}/>
                         }>
                             
                             <Route path='/users'  >

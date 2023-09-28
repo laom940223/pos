@@ -1,0 +1,20 @@
+POST  http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+
+    "name":"Employee",
+    "lastname":"Test",
+    "username":"employee",
+    "password":"password",
+    "email":"employee@test.com",
+    "confirmPassword":"password",
+    "role":"EMPLOYEE"
+
+}
+
+
+###
+
+GET  http://localhost:8080/api/register-sessions/operations/register/1
+Content-Type:  application/json

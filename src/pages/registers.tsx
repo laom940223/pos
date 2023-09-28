@@ -74,14 +74,14 @@ export const RegistersPage = ()=>{
 
 
 
-    const cards = registersQuery.data.data.map( regis=>{
+    const cards = registersQuery.data.data.map( (regis)=>{
         
         
 
 
         return (
 
-                    <Col span={8}>
+                    <Col span={8}key ={regis.id}>
                         <Card title={regis.name}  >
 
                             <Row style={{width:"100%"}}>

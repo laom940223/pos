@@ -8,7 +8,7 @@ import { ColumnsType } from "antd/es/table";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { QUERIES } from "../../consts/query-consts";
 
-import { OperationEnum, OperationType, ProductOperationDetail, RegisterSession } from "../../consts/operations";
+import { OperationEnum, Operation, ProductOperationDetail, RegisterSession } from "../../consts/operations";
 import { AddBuyItem } from "../../components/utils/add-buy-item";
 import { ProviderBuys } from "../../components/checkout/provider-buys";
 import { SearchProduct } from "../../components/operations/search-products";
@@ -129,7 +129,7 @@ export const Buys = ()=>{
             
 
 
-        } as OperationType )
+        } as Operation )
 
 
         setCash(0)

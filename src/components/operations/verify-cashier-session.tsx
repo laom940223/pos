@@ -186,7 +186,7 @@ export const VerifyCashierSession =  (   )=>{
                 
 
 
-            console.log("Before outlet")
+            
             return <Outlet/>
 
             

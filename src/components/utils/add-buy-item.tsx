@@ -99,7 +99,7 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
             factor: values.factor,
             quantity: values.quantity,
             product: product || undefined,
-            type: ProductDetailType.BUY,
+            productId:product?.id,
             salePrice1: values.salePrice1,
          } as ProductOperationDetail)
       }  
@@ -112,8 +112,7 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
             factor: values.factor,
             quantity: values.quantity,
             product: product || undefined,
-            type: ProductDetailType.BUY,
-            salePrice1: values.salePrice1,
+            productId:product?.id,
          } as ProductOperationDetail)
 
       }
@@ -140,8 +139,8 @@ export const AddBuyItem =  ({ product, set }: SearchResourceProps)=>{
         },
         {
           key: '2',
-          label: 'Description',
-          children: <p>{product?.description}</p>,
+          label: 'Name',
+          children: <p>{product?.name}</p>,
         },
         {
           key: '3',

@@ -39,42 +39,69 @@ export type RegisterSession = {
  }
 
 
- export type OperationType ={
+ export type Operation ={
 
     id: number, 
     sessionId: number,
-    type: string,
-    client?: ClientType | number,
-    provider?: ProviderType | number
-    amount: number,
-    authorizedBy?: UsersType | number
-    products?: ProductOperationDetail[]
+    type: OperationEnum,
+    
+    
+    
+    authorized?: UsersType ,
+    authorizedBy?: number,
+    
+    total: number,
+
+
+    cardAmount: number,
+    cashAmount: number, 
+    creditAmount: number
+
     createdAt?: Date
 
+
+    //Flieds for both
+    products?: ProductOperationDetail[]
+
+    //Fields for sales
+    client?: ClientType,
+    clientId: number,
+    
+
+    ///Fields for buys
+    provider?: ProviderType,
+    providerId: number,
+
 }
+
+export type CreateOperation = Omit<Operation, "id">
 
 export type ProductOperationDetail = {
 
     id?:number
+
     operationId?: number,
-    factor?: number,
-    type:string,
+    
+    product?: ProductType,
+    productId: number, 
+    
+    quantity: number, 
+
+
     price?: number,
-    quantity: number,
-    product?: ProductType ,
 
-    salePrice1?: number,
-    salePrice2?: number,
+    //Buy properties
+    factor?: number,
+    buyPrice1?: number,
+    amountPrice1?: number,
+    buyPrice2?: number,
+    amountPrice2?: number,
     
     
 
 }
 
-export enum ProductDetailType {
 
-    SALE ="SALE",
-    BUY= "BUY"
-}
 
 export enum OperationEnum {
 
@@ -142,29 +169,3 @@ export const sampleregisterSession: RegisterSession[] = [
 
 
 
-export const sampleOpeations: OperationType[] =[
-
-
-    {
-        id:1,
-        sessionId: sampleregisterSession[0].id!,
-        amount:820,
-        type:"SALE"
-    },
-
-    {
-        id:2,
-        sessionId: sampleregisterSession[0].id!,
-        amount:250,
-        type:"BUY"
-    },
-
-    {
-        id:3, 
-        sessionId: sampleregisterSession[0].id!,
-        amount:580,
-        type:"SALE"
-
-    }
-
-]
